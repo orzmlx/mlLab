@@ -1,0 +1,54 @@
+---
+title: 'Lab1'
+author: 'liume102@student.liu.se'
+date: '12 Nov 2024'
+output:
+  html_document:
+    number_sections: true
+    toc: true
+    fig_width: 7
+    fig_height: 4.5
+    theme: readable
+    highlight: tango
+---
+
+# Introduction
+
+This is the first lab in the Machine Learning In this lab, contains the following tasks:1. Handwritten digit recognition with Knearest neighbors.2.Linear regression and ridge regression.3. Logistic regression and basis function expansion.4. Theory
+
+# Handwritten digit recognition with Knearest neighbors
+
+
+
+## Load and check data
+
+```{r, message = FALSE}
+# Load packages
+library('ggplot2') # visualization
+library('ggthemes') # visualization
+library('scales') # visualization
+library('dplyr') # data manipulation
+library('mice') # imputation
+library('randomForest') # classification algorithm
+library('caret')
+```
+
+Now that our packages are loaded and we divide it into training, validation and test sets (50%/25%/25%)
+```{r, message=FALSE, warning=FALSE}
+digitals <- read.csv('../data/optdigits.csv', stringsAsFactors = F,header = FALSE)
+
+train_index <- createDataPartition(digitals$V65, p = 0.5, list = F) 
+train_digitals <- digitals[train_index,]
+remainingData <- digitals[-train_index, ]
+validationIndex <- createDataPartition(remainingData$V65, p = 0.5, list = FALSE)
+valid_digitals <- remainingData[validationIndex, ]
+test_digitals <- remainingData[-validationIndex, ]
+```
+
+# KNN to fit classification model
+```{r, message=FALSE, warning=FALSE}
+library(knn)
+
+
+
+```
