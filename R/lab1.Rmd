@@ -3,22 +3,20 @@ title: 'Lab1'
 author: 'liume102@student.liu.se'
 date: '12 Nov 2024'
 output:
-  html_document:
-    number_sections: true
-    toc: true
-    fig_width: 7
-    fig_height: 4.5
-    theme: readable
-    highlight: tango
+html_document:
+  number_sections: true
+  toc: true
+  fig_width: 7
+  fig_height: 4.5
+  theme: readable
+  highlight: tango
 ---
 
 # Introduction
 
 This is the first lab in the Machine Learning In this lab, contains the following tasks:1. Handwritten digit recognition with Knearest neighbors.2.Linear regression and ridge regression.3. Logistic regression and basis function expansion.4. Theory
 
-# Handwritten digit recognition with Knearest neighbors
-
-
+# Assignment 1: Handwritten digit recognition with Knearest neighbors
 
 ## Load and check data
 
@@ -28,27 +26,207 @@ library('ggplot2') # visualization
 library('ggthemes') # visualization
 library('scales') # visualization
 library('dplyr') # data manipulation
-library('mice') # imputation
 library('randomForest') # classification algorithm
 library('caret')
 ```
 
 Now that our packages are loaded and we divide it into training, validation and test sets (50%/25%/25%)
-```{r, message=FALSE, warning=FALSE}
-digitals <- read.csv('../data/optdigits.csv', stringsAsFactors = F,header = FALSE)
 
+```{r, message=FALSE, warning=FALSE}
+# do not use StringAsFact = FALSE
+digitals <- read.csv('../data/optdigits.csv',header = FALSE)
+# change all the columns to factor
+#digitals <- digitals %>% mutate_all(as.factor)
+digitals$V65 <- as.factor(digitals$V65)
 train_index <- createDataPartition(digitals$V65, p = 0.5, list = F) 
 train_digitals <- digitals[train_index,]
 remainingData <- digitals[-train_index, ]
 validationIndex <- createDataPartition(remainingData$V65, p = 0.5, list = FALSE)
 valid_digitals <- remainingData[validationIndex, ]
 test_digitals <- remainingData[-validationIndex, ]
+cat("train length:", nrow(train_digitals),'\n')
+cat("test length:", nrow(valid_digitals),'\n')
+cat("valid length:", nrow(test_digitals),'\n')
 ```
 
-# KNN to fit classification model
+## KNN to fit classification model using train data
+
 ```{r, message=FALSE, warning=FALSE}
-library(knn)
+library(kknn)
+formula <- V65~.
+# if kenerl = 'rectangular' , so every point in the neighborhood is weighted equally
+# both of the parameters of train and test use train_digital data
+# if  your predict columns is continuous, kknn will recognized as a regression task
+# under this situation, you can not get a probability of the prediction
+knn_train_model <- kknn(formula, train_digitals, train_digitals,  kernel = 'rectangular',distance = 1,)
+train_predictions <- fitted(knn_train_model)
+print(length(train_predictions))
+summary(knn_train_model)
+```
 
+## Predict on the test data
 
+```{r, message=FALSE, warning=FALSE}
+knn_test_model <- kknn(formula, train = train_digitals, test = test_digitals, k = 30, kernel = 'rectangular')
+print(length(knn_test_model$fitted.values))
 
 ```
+
+## Confusion matrices and Misclassification errors for train data and test data
+
+```{r message=FALSE, warning=FALSE}
+
+train_confusion <- table(train_digitals$V65, train_predictions)
+test_confusion <- table(test_digitals$V65, knn_test_model$fitted.values)
+test_error_rate <- 1 - sum(diag(test_confusion)) / sum(test_confusion)
+train_error_rate <- 1-  sum(diag(train_confusion)) / sum(train_confusion)
+# only observer the top 10 rows
+cat("Misclassification errors on train data:", train_error_rate, '\n')
+cat("train_confusion:")
+table(train_digitals$V65[1:10], train_predictions[1:10])
+cat("Misclassification errors on test data:", test_error_rate, '\n')
+cat("test confusion:")
+table(test_digitals$V65[1:10], knn_test_model$fitted.values[1:10])
+
+```
+
+## Filter 2 cases of digit “8” in the training data which were easiest to classify and 3 cases that were hardest to classify
+
+```{r message=FALSE, warning=FALSE}
+# filter the digital '8'
+library(dplyr)
+
+train_predict <- data.frame(train_digitals$V65, train_predictions,knn_train_model$prob)
+train_predict$max_prob <- apply(train_predict[,3:12], 1, max)
+
+train_predict_8 <- train_predict[train_predict$train_digitals.V65 == 8,]
+# do not change the index while sorting
+train_predict_8 <- train_predict_8[order(train_predict_8$X8), , drop = FALSE]
+
+# get the 3 cases that were hardest to classify
+hardest_cases_for_8 <- train_predict_8 %>% head(3)
+easy_cases_for_8 <- train_predict_8 %>% tail(2)
+
+```
+
+## Analysis the difference of the hardest case and easiest cases
+
+we can see on the heatmap that the hardest cases are more complex than the easiest cases. Dark-colored squares concentrated in the middle of the matrix while the easiest cases are more concentrated on the edges which looking more like the number 8.
+
+```{r message=FALSE, warning=FALSE}
+hardest_cases_index <- rownames(hardest_cases_for_8)
+est_cases_index <- rownames(easy_cases_for_8)
+# reindex the row index
+row.names(train_digitals) <- NULL
+full_hardest_cases <- train_digitals[hardest_cases_index,1:64]
+full_est_cases <- train_digitals[est_cases_index,1:64]
+
+hardest_matrixs <- lapply(1:nrow(full_hardest_cases), function(i) matrix(as.numeric(full_hardest_cases[i, , drop = FALSE]),nrow = 8,ncol = 8))
+est_matrixs <- lapply(1:nrow(full_est_cases), function(i) matrix(as.numeric(full_est_cases[i, , drop = FALSE]),nrow = 8,ncol = 8))
+
+for (i in 1:length(hardest_matrixs)) {
+mat <- hardest_matrixs[[i]]
+heatmap(mat, Colv = NA, Rowv = NA, scale = "none", main = paste("Hard Case", i))
+}
+
+for (i in 1:length(est_matrixs)) {
+mat <- est_matrixs[[i]]
+heatmap(mat, Colv = NA, Rowv = NA, scale = "none", main = paste("Hard Case", i))
+
+}
+
+```
+
+## Training via different k in on the training and validation data
+
+according the plot , k = 3 is best value on training data and validation data, though the performance of k = 1 is better than k = 3 on training data, it is not the best value on validation data due to the weak generalization ability, but when we apply it on test data, its performance is not as good as predicted
+
+```{r message=FALSE, warning=FALSE}
+library(ggplot2)
+train_error_rates <- list()
+valid_error_rates <- list()
+test_error_rates <- list()
+
+for (ki in 1:30) {
+# cat(paste("current k:",ki,"\n",sep=""))
+train_ki_model <- kknn(formula, train = train_digitals, test = train_digitals, k = ki, kernel = 'rectangular')
+valid_ki_model <- kknn(formula, train = train_digitals, test = valid_digitals, k = ki, kernel = 'rectangular')
+
+test_ki_model <- kknn(formula, train = train_digitals, test = test_digitals, k = ki, kernel = 'rectangular')
+
+train_confusion <- table(train_digitals$V65, train_ki_model$fitted.values)
+valid_confusion <- table(valid_digitals$V65, valid_ki_model$fitted.values)
+test_confusion <- table(test_digitals$V65, test_ki_model$fitted.values)
+
+train_error_rate <- sum(diag(train_confusion)) / sum(train_confusion)
+valid_error_rate <- sum(diag(valid_confusion)) / sum(valid_confusion)
+
+test_error_rate <- sum(diag(test_confusion)) / sum(test_confusion)
+
+# print(train_error_rate)
+# print(valid_error_rate)
+train_error_rates[[ki]] <- 1 - train_error_rate
+valid_error_rates[[ki]] <- 1 - valid_error_rate
+test_error_rates[[ki]] <- 1 - test_error_rate
+
+}
+plot(1:30, train_error_rates, type = "o", col = "blue", ylim = range(c(train_error_rates, valid_error_rates)),
+ xlab = "Number of Neighbors (K)", ylab = "Mis-classification Error", main = "Training and Validation Errors")
+lines(1:30, valid_error_rates, type = "o", col = "red")
+lines(1:30, test_error_rates, type = "o", col = "green")
+legend("topright", legend = c("Training Error", "Validation Error","Test Error"), col = c("blue", "red","green"), lty = 1)
+# 
+
+```
+
+## Change mis-classification error to cross-entropy
+
+```{r message=FALSE, warning=FALSE}
+valid_cross_entropy_errors <- list()
+train_cross_entropy_errors <- list()
+test_cross_entropy_errors <- list()
+
+for (ki in 1:30) {
+
+  print(ki)
+  valid_ki_model <- kknn(formula, train = train_digitals, test = valid_digitals, k = ki, kernel = 'rectangular')
+  train_ki_model <- kknn(formula, train = train_digitals, test = train_digitals, k = ki, kernel = 'rectangular')
+  test_ki_model <- kknn(formula, train = train_digitals, test = test_digitals, k = ki, kernel = 'rectangular')
+  valid_probs <- valid_ki_model$prob
+  train_probs <- train_ki_model$prob
+  test_probs <- test_ki_model$prob
+  
+  valid_log_probs <- log(valid_probs + 1e-15)  # Add small constant to avoid log(0)
+  train_log_probs <- log(train_probs + 1e-15)  # Add small constant to avoid log(0)
+  test_log_probs <- log(test_probs + 1e-15)  # Add small constant to avoid log(0)
+  
+  # -1 means do not contain intercept
+  # One-hot encoding
+  #This type of matrix is typically used in machine learning and statistical modeling for feature      #engineering, particularly when converting categorical variables into dummy variables. 
+  valid_correct_class <- model.matrix(~V65 - 1, data = valid_digitals)  # One-hot encoding
+  train_correct_class <- model.matrix(~V65 - 1, data = train_digitals)  # One-hot encoding
+  test_correct_class <- model.matrix(~V65 - 1, data = test_digitals)  # One-hot encoding
+  
+  valid_cross_entropy_errors[[ki]] <- -sum(valid_correct_class * valid_log_probs) / nrow(valid_digitals)
+  train_cross_entropy_errors[[ki]] <- -sum(train_correct_class * train_log_probs) / nrow(train_digitals)
+  test_cross_entropy_errors[[ki]] <- -sum(test_correct_class * test_log_probs) / nrow(test_digitals)
+  print(-sum(valid_correct_class * valid_log_probs) )
+  print(-sum(train_correct_class * train_log_probs))
+  print(-sum(test_correct_class * test_log_probs) )
+}
+
+
+# plot(1:30, train_error_rates, type = "o", col = "blue", ylim = range(c(train_error_rates, valid_error_rates)),
+#    xlab = "Number of Neighbors (K)", ylab = "Mis-classification Error", main = "Training and Validation Errors")
+# lines(1:30, valid_error_rates, type = "o", col = "red")
+# lines(1:30, test_error_rates, type = "o", col = "green")
+# legend("topright", legend = c("Training Error", "Validation Error","Test Error"), col = c("blue", "red","green"), lty = 1)
+plot(1:30, valid_cross_entropy_errors, type = "o", col = "purple",
+   xlab = "Number of Neighbors (K)", ylab = "Cross-Entropy Error", main = "Validation Cross-Entropy Error")
+lines(1:30, train_cross_entropy_errors, type = "o", col = "red")
+lines(1:30, test_cross_entropy_errors, type = "o", col = "green")
+legend("topright", legend = c("Training Cross-Entropy Error", "Validation Cross-Entropy Error","Test  Cross-Entropy Error"), col = c("red", "purple","green"), lty = 1)
+```
+
+
+
