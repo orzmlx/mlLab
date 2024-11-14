@@ -515,7 +515,7 @@ ggtitle("Scatterplot of Plasma Glucose vs Age by raw diabetes Status")
 
 ```
 
-##Perform a basis function expansion trick
+## Perform a basis function expansion trick
 
 we can see that after add the basis function expansion, the misclassification error is lower than the previous model, it means that the basis function expansion can improve the performance of the model, look at the coefficients furtherly, the new added variables slightly affect the prediction, it means that the new added variables affect the prediction positively and the decision boundary become from a line to a multidimensional graphics
 
