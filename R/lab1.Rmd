@@ -340,6 +340,8 @@ for (i in seq_along(lambda_values)){
   ridgemodel<- ridgeopt(lambda,train_data2,train_value)
   thetavalue<- ridgemodel$theta
   
+  theta_value[[i]]<- thetavalue
+  
   train_predictions<- train_data2 %*% thetavalue
   train_mse2[i]<- mean((train_value - train_predictions)^2)
   
@@ -352,7 +354,7 @@ for (i in seq_along(lambda_values)){
     train_mse2 = train_mse2,
     test_mse2 = test_mse2,
     df = df,
-    theta_value = thetavalue
+    theta_value = theta_value
   )
 }
 print(result)
