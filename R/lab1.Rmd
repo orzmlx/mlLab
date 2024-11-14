@@ -242,7 +242,7 @@ library(caret)
 
 Firstly, we read the file and divided the data into training and test data (60/40).
 ```{r code}
-data <- read.csv("parkinsons.csv")
+data <- read.csv("../data/parkinsons.csv") #
 set.seed(42)
 ini_sample<- sample(1:nrow(data),0.6*nrow(data))
 train_data<- data[ini_sample,]
