@@ -200,9 +200,9 @@ for (ki in 1:30) {
   train_log_probs <- log(train_probs + 1e-15)  # Add small constant to avoid log(0)
   test_log_probs <- log(test_probs + 1e-15)  # Add small constant to avoid log(0)
   
-  # -1 means do not contain intercept
-  # One-hot encoding
-  #This type of matrix is typically used in machine learning and statistical modeling for feature      #engineering, particularly when converting categorical variables into dummy variables. 
+# -1 means do not contain intercept
+# One-hot encoding
+ #This type of matrix is typically used in machine learning and statistical modeling for feature      #engineering, particularly when converting categorical variables into dummy variables. 
   valid_correct_class <- model.matrix(~V65 - 1, data = valid_digitals)  # One-hot encoding
   train_correct_class <- model.matrix(~V65 - 1, data = train_digitals)  # One-hot encoding
   test_correct_class <- model.matrix(~V65 - 1, data = test_digitals)  # One-hot encoding
@@ -230,9 +230,10 @@ legend("topright", legend = c("Training Cross-Entropy Error", "Validation Cross-
 
 # Assignment 2: Linear regression and ridge regression
 
-##  set up
+## set up
 
 We need to download some useful packages before the start.
+
 ```{r setup}
 install.packages("caret")
 library(caret)
@@ -241,6 +242,7 @@ library(caret)
 ## Prepare the dataset
 
 Firstly, we read the file and divided the data into training and test data (60/40).
+
 ```{r code}
 data <- read.csv("../data/parkinsons.csv") #
 set.seed(42)
@@ -250,6 +252,7 @@ test_data<- data[-ini_sample,]
 ```
 
 And then we scaled the dataset appropriately.
+
 ```{r code}
 sacale_data<- train_data[,names(train_data)!="motor_UPDRS"]
 scale_para<- preProcess(sacale_data)
@@ -262,6 +265,7 @@ test_data_scaled$motor_UPDRS <- test_data$motor_UPDRS
 ## Build models
 
 Next, we computed a linear regression model , estimate training and test MSE
+
 ```{r code}
 model<- lm(motor_UPDRS ~ .,train_data_scaled)
 train_prediction<- predict(model,train_data_scaled)
@@ -274,6 +278,7 @@ summary(model)
 Implement 4 following functions:
 
 loglikelihiid function that for a given parameter vector theta and dispersion sigma.
+
 ```{r code}
 logLikelihood <- function(theta, sigma, x, y) {
   n <- length(y)
@@ -285,6 +290,7 @@ logLikelihood <- function(theta, sigma, x, y) {
 ```
 
 Ridge function that for given vector theta, scalar sigma and scalar lambda and adds up a Ridge penalty to the minus loglikelihood.
+
 ```{r code}
 ridge <- function(theta, sigma, lambda, x, y) {
   log_likelihood <- logLikelihood(theta, sigma, x, y)
@@ -294,6 +300,7 @@ ridge <- function(theta, sigma, lambda, x, y) {
 ```
 
 Use function optim() with method=”BFGS” to find the optimal theta and sigma for the given lambda.
+
 ```{r code}
 ridgeopt <- function(lambda, x, y) {
   n <- ncol(x)
@@ -311,6 +318,7 @@ ridgeopt <- function(lambda, x, y) {
 ```
 
 computes the degrees of freedom of the Ridge model based on the training data.
+
 ```{r code}
 freedom_degree <- function(lambda, x) {
   xT <- t(x) %*% x
@@ -323,11 +331,12 @@ freedom_degree <- function(lambda, x) {
 ## predict the values
 
 Finally, we can compute optimal theta parameters for different lambda values by using function RidgeOpt.
+
 ```{r code}
-train_data2<- as.matrix(train_data[,names(train_data)!="motor_UPDRS"])
+train_data2 <- as.matrix(train_data[,names(train_data)!="motor_UPDRS"])
 test_data2<- as.matrix(test_data[,names(test_data)!="motor_UPDRS"])
-train_value<- train_data$motor_UPDRS
-test_value<- test_data$motor_UPDRS
+train_value <- train_data$motor_UPDRS
+test_value <- test_data$motor_UPDRS
 
 lambda_values <- c(1, 100, 1000)
 
@@ -348,9 +357,9 @@ for (i in seq_along(lambda_values)){
   test_predictions<- test_data2 %*% thetavalue
   test_mse2[i]<- mean((test_value - test_predictions)^2)
   
-  df[i]<- freedom_degree(lambda,train_data2)
+  df[i] <- freedom_degree(lambda,train_data2)
   
-  result<- list(
+  result <- list(
     train_mse2 = train_mse2,
     test_mse2 = test_mse2,
     df = df,
@@ -359,7 +368,169 @@ for (i in seq_along(lambda_values)){
 }
 print(result)
 ```
-In general, a lower test MSE indicates that the model generalizes better.
-Higher degrees of freedom mean that models are more flexible and tend to fit details in the data, but can lead to overfitting; Lower degrees of freedom mean that the model is smoother, limiting the fit to the training data.
+
+In general, a lower test MSE indicates that the model generalizes better. Higher degrees of freedom mean that models are more flexible and tend to fit details in the data, but can lead to overfitting; Lower degrees of freedom mean that the model is smoother, limiting the fit to the training data.
 
 In this example, under penalty parameter equals to 1, the model's train_mse2 and test_mse2 are the lowest, and the degree of freedom is small but not too low.So it is the most appropriate parameter choice.
+
+# Assignment 3. Logistic regression and basis function expansion
+
+## Read Data and show scatter plot
+
+read data and give a scatter plot showing a Plasma glucose concentration on Age where observations are colored by Diabetes levels
+
+```{r message=FALSE, warning=FALSE}
+
+diabetes <- read.csv('../data/pima-indians-diabetes.csv',header = FALSE)
+colnames(diabetes) <- c('Pregnancies','Plasma_glucose','blood_pressure','TricepsSkinFoldThickness','SerumInsulin','BMI','DiabetesPedigreeFunction','Age','Diabetes')
+# 
+ggplot(diabetes,aes( x = diabetes$Age, y = diabetes$Plasma_glucose, color = diabetes$Diabetes)) + geom_point()+
+labs(x = "Age", y = "Plasma Glucose Concentration", color = "Diabetes") +
+ggtitle("Scatterplot of Plasma Glucose vs Age by Diabetes Status")
+
+
+```
+
+## Train a logistic regression model when the threshold r = 0.5
+
+```{r message=FALSE, warning=FALSE}
+
+formula <- Diabetes ~ Age + Plasma_glucose
+diabetes$Diabetes <- as.factor(diabetes$Diabetes)
+gml_model <- caret::train(formula, data = diabetes, method = "glm", family = "binomial")
+#type = "prob" predict probability
+#type = "raw" predict the raw value/ class
+#diabetes_pred <- predict(gml_model, type = "prob")
+
+classify_pred_res <- function(r,gml_model) {
+
+  diabetes_pred <- predict(gml_model, type = "prob")
+  diabetes_pred$predict <- lapply(1:nrow(diabetes_pred), function(x) ifelse(diabetes_pred[x,2] > r, 1, 0))
+  diabetes_pred$predict <- unlist(diabetes_pred$predict)
+  diabetes_pred$raw <- diabetes$Diabetes
+  diabetes_pred[, 3:4] <- lapply(diabetes_pred[, 3:4], as.factor)
+  
+  trainingData <-  gml_model$trainingData %>% select(-.outcome)
+  diabetes_pred <- cbind(diabetes_pred, trainingData)
+  
+  diabetes_pred$Age <- gml_model$trainingData$Age
+  diabetes_pred$Plasma_glucose <- gml_model$trainingData$Plasma_glucose
+  return(diabetes_pred)
+}
+
+diabetes_pred <- classify_pred_res(0.5,gml_model)
+
+diabetes_confusion <- table(diabetes_pred$raw, diabetes_pred$predict)
+error_rate <- 1 - (sum(diag(diabetes_confusion)) / sum(diabetes_confusion))
+cat(" training misclassification error:",error_rate)
+
+```
+
+## Draw a scatter plot showing the predicted diabetes status
+
+we can see that the logistic regression visually separates the two classes of diabetes status well, but the mis classification error is high due to the overlap of the two classes, maybe change 𝑟 can improve the performance.we will try later
+
+```{r message=FALSE, warning=FALSE}
+
+ggplot(diabetes,aes( x = diabetes_pred$Age, y = diabetes_pred$Plasma_glucose, color = diabetes_pred$predict)) + geom_point()+
+labs(x = "Age", y = "Plasma Glucose Concentration", color = "Predicted Diabetes") +
+ggtitle("Scatterplot of Plasma Glucose vs Age by Diabetes Status")
+```
+
+## Draw a decision boundary between the two predicted classes
+
+we can see that the boundary line try to split the dots into two classes and put the most the red dots below the line and the most blue dots above the line, but when the age exceed the 50, the performance of the model is not good.it seems that the number of red dot below the boundary line is same as the number above the line, it results the high misclassification error
+
+```{r message=FALSE, warning=FALSE}
+
+get_boundary_line <- function(gml_model,r, y_name) {
+  coefficients <- gml_model$finalModel$coefficients
+  boundary_parameter <- list()
+  coef_names <- names(coefficients) 
+  y_value <- coefficients[[y_name]]
+  boundary_parameter$Intercept <- -(coefficients[['(Intercept)']] / y_value) - (log((1/r) - 1)/y_value)
+  # boundary_parameter$intercept <- intercept
+  for (name in coef_names){
+    if (name != '(Intercept)'){
+      boundary_parameter[[name]] <- -coefficients[[name]] / y_value
+    }
+  }
+  return(boundary_parameter)
+}
+
+boundary_parameter <- get_boundary_line(gml_model,0.5,'Plasma_glucose')
+ggplot(diabetes,aes( x = diabetes$Age, y = diabetes$Plasma_glucose, color  = diabetes$Diabetes)) +
+  geom_point()+
+  geom_abline(slope = boundary_parameter$Age, intercept = boundary_parameter$Intercept, color = "blue", linetype = "dashed") +
+  labs(x = "Age", y = "Plasma Glucose Concentration", color = "Diabetes") +
+  ggtitle("Scatterplot with Decision Boundary")
+```
+
+## Change the thresholds r to 0.2 , 0.8 to see the what happened
+
+we can see that when r = 0.2, for the red dots , its TP is relatively high , but the Recall is low ,for the blue dots,its TP is lower than red dots, but the Recall is higher than red dots, it means that the model is more likely to predict the blue dots as the positive class, but the blue dots are more likely to be the negative class, it results in the high misclassification error, when r = 0.8, the model is more likely to predict the red dots as the positive class, but the red dots are more likely to be the negative class, it results in the high misclassification error
+
+```{r message=FALSE, warning=FALSE}
+
+pred_res_0.2 <- classify_pred_res(0.2,gml_model)
+pred_res_0.8 <- classify_pred_res(0.8,gml_model)
+
+```
+
+### plot the scatter when r = 0.2
+
+```{r message=FALSE, warning=FALSE}
+
+boundary_parameter_0.2 <- get_boundary_line(gml_model,0.2,'Plasma_glucose')
+
+ggplot(diabetes,aes( x = pred_res_0.2$Age, y = pred_res_0.2$Plasma_glucose, color = pred_res_0.2$predict)) + geom_point()+
+geom_abline(slope = boundary_parameter_0.2$Age, intercept = boundary_parameter_0.2$Intercept, color = "blue", linetype = "dashed") +
+labs(x = "Age", y = "Plasma Glucose Concentration", color = "Predicted Diabetes") +
+ggtitle("Scatterplot of Plasma Glucose vs Age by predicted diabetes Status")
+
+
+ggplot(diabetes,aes( x = pred_res_0.2$Age, y = pred_res_0.2$Plasma_glucose, color = pred_res_0.2$raw)) + geom_point()+
+geom_abline(slope = boundary_parameter_0.2$Age, intercept = boundary_parameter_0.2$Intercept, color = "blue", linetype = "dashed") +
+labs(x = "Age", y = "Plasma Glucose Concentration", color = "Predicted Diabetes") +
+ggtitle("Scatterplot of Plasma Glucose vs Age by raw diabetes Status")
+```
+
+### plot the scatter when r = 0.8
+
+```{r message=FALSE, warning=FALSE}
+
+boundary_parameter_0.8 <- get_boundary_line(gml_model,0.8,'Plasma_glucose')
+
+ggplot(diabetes,aes( x = pred_res_0.8$Age, y = pred_res_0.8$Plasma_glucose, color = pred_res_0.8$predict)) + geom_point()+
+geom_abline(slope = boundary_parameter_0.8$Age, intercept = boundary_parameter_0.8$Intercept, color = "blue", linetype = "dashed") +
+labs(x = "Age", y = "Plasma Glucose Concentration", color = "Predicted Diabetes") +
+ggtitle("Scatterplot of Plasma Glucose vs Age by predicted diabetes Status")
+
+
+ggplot(diabetes,aes( x = pred_res_0.8$Age, y = pred_res_0.8$Plasma_glucose, color = pred_res_0.8$raw)) + geom_point()+
+geom_abline(slope = boundary_parameter_0.8$Age, intercept = boundary_parameter_0.8$Intercept, color = "blue", linetype = "dashed") +
+labs(x = "Age", y = "Plasma Glucose Concentration", color = "Predicted Diabetes") +
+ggtitle("Scatterplot of Plasma Glucose vs Age by raw diabetes Status")
+
+
+```
+
+##Perform a basis function expansion trick
+
+we can see that after add the basis function expansion, the misclassification error is lower than the previous model, it means that the basis function expansion can improve the performance of the model, look at the coefficients furtherly, the new added variables slightly affect the prediction, it means that the new added variables affect the prediction positively and the decision boundary become from a line to a multidimensional graphics
+
+```{r message=FALSE, warning=FALSE}
+diabetes$z1 <- diabetes$Plasma_glucose^4
+diabetes$z2 <- diabetes$Plasma_glucose^3 * diabetes$Age
+diabetes$z3 <- diabetes$Plasma_glucose^2 * diabetes$Age^2
+diabetes$z4 <- diabetes$Plasma_glucose * diabetes$Age^3
+diabetes$z5 <- diabetes$Age^4
+formula <- Diabetes ~ Age + Plasma_glucose + z1 + z2 + z3 + z4 + z5
+new_gml_model <- caret::train(formula, data = diabetes, method = "glm", family = "binomial")
+new_pred_res <- classify_pred_res(0.5,new_gml_model)
+new_diabetes_confusion <- table(new_pred_res$raw, new_pred_res$predict)
+error_rate <- 1 - (sum(diag(new_diabetes_confusion)) / sum(new_diabetes_confusion))
+cat(" training misclassification error:",error_rate)
+new_boundary_parameter <- get_boundary_line(new_gml_model,0.5,'Plasma_glucose')
+cat(new_gml_model$finalModel$coefficients)
+```
