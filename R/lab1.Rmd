@@ -534,3 +534,19 @@ cat(" training misclassification error:",error_rate)
 new_boundary_parameter <- get_boundary_line(new_gml_model,0.5,'Plasma_glucose')
 cat(new_gml_model$finalModel$coefficients)
 ```
+# Assignment 4: Handwritten digit recognition with Knearest neighbors
+
+-   Why can it be important to consider various probability thresholds in the classification problems, according to the book?
+
+Probability thresholds serve as the reference point for evaluating performance of the model. Usually, a baseline is defined to indicate the model's worst performance level. And the achievable performance is defined by the maximum performance level. (Page 290 Baseline and Achievable Performance Level)
+
+-   What ways of collecting correct values of the target variable for the supervised learning problems are mentioned in the book?
+
+In supervised learning problems, the target variables can be manually labelled by a domain expert.Target variables can also be labelled from predictive models based. Or the output is labelled naturally during the collection of training data. (Page 6, paragraph 2)
+
+-   How can one express the cost function of the linear regression in the matrix form, according to the book? The cost function for the linear regression model can be written with matrix notations as:
+-   \|$$
+       J(𝜽)= \frac{1}{n}\sum_{i = 1}^{n}{(\hat{y}{(x_i;𝜽)} - y_i)^2}=\frac{1}{n}
+       ||\hat{y}-y||^{2}_{2}=\frac{1}{n}||{X𝜽}-y||^{2}_{2}=\frac{1}{n}||∊||^{2}_{2}
+    $$
+
