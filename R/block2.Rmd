@@ -1,0 +1,218 @@
+---
+title: "block2"
+author: "hanxi898@student.liu.se"
+date: "2024-11-18"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+install.packages("randomForest")
+library(randomForest)
+```
+
+## Introduction
+
+This is the lab for bock2 in the Machine Learning. In this lab, contains the following tasks:1. ENSEMBLE METHODS.2.MIXTURE MODELS.3. Theory
+
+# Assignment 1:ENSEMBLE METHODS
+
+We need to download the package before the start.
+```{r setup}
+install.packages("randomForest")
+library(randomForest)
+```
+
+#build test datatest
+```{r dataset}
+set.seed(1234)
+x1 <- runif(1000)
+x2 <- runif(1000)
+testdata <- cbind(x1, x2)
+y <- as.numeric(x1 < x2)
+testlabels <- as.factor(y)
+```
+
+#build the train dataset for 1000 times with the size of 100
+```{r example}
+error_rate_1<- list(
+  number1 = rep(0,1000),
+  number1 = rep(0,1000),
+  number1 = rep(0,1000)
+)
+mean_error_1<- c()
+var_error_1<- c()
+for (i in 1:1000) {
+  x1 <- runif(100)
+  x2 <- runif(100)
+  trdata <- cbind(x1, x2)
+  y <- as.numeric(x1 < x2)
+  trlabels <- as.factor(y)
+  
+  #build the models
+  
+  rf_model1 <- randomForest(trdata, trlabels, ntree = 1, nodesize = 25, keep.forest = TRUE)
+  rf_model2 <- randomForest(trdata, trlabels, ntree = 10, nodesize = 25, keep.forest = TRUE)
+  rf_model3 <- randomForest(trdata, trlabels, ntree = 100, nodesize = 25, keep.forest = TRUE)
+
+  #predictions and error rates
+  predictions1<- predict(rf_model1,testdata)
+  error_rate_1$number1[i] <- mean(predictions1 != testlabels)
+  predictions2<- predict(rf_model2,testdata)
+  error_rate_1$number2[i] <- mean(predictions2 != testlabels)
+  predictions3<- predict(rf_model3,testdata)
+  error_rate_1$number3[i] <- mean(predictions3 != testlabels)
+
+}
+```
+
+#compute the mean and variance of error rates
+```{r example}
+mean_error_1[1]<- mean(error_rate_1$number1)
+mean_error_1[2]<- mean(error_rate_1$number2)
+mean_error_1[3]<- mean(error_rate_1$number3)
+
+var_error_1[1] <- var(error_rate_1$number1)
+var_error_1[2] <- var(error_rate_1$number2)
+var_error_1[3] <- var(error_rate_1$number3)
+
+```
+
+Then, we can change the condition,and the calculation is the same as before.
+
+#change the conditions of x1/x3
+#build test datatest
+```{r example}
+set.seed(1234)
+x3 <- runif(1000)
+x4 <- runif(1000)
+testdata2 <- cbind(x3, x4)
+y2 <- as.numeric(x3 < 0.5)
+testlabels2 <- as.factor(y2)
+```
+
+#build the train dataset for 1000 times with the size of 100
+```{r example}
+error_rate_2<- list(
+  number1 = rep(0,1000),
+  number2 = rep(0,1000),
+  number3 = rep(0,1000)
+)
+mean_error_2<- c()
+var_error_2<- c()
+for (i in 1:1000) {
+  x3 <- runif(100)
+  x4 <- runif(100)
+  trdata <- cbind(x3, x4)
+  y <- as.numeric(x3 < 0.5)
+  trlabels <- as.factor(y)
+
+  #build the models
+  rf_model1 <- randomForest(trdata, trlabels, ntree = 1, nodesize = 25, keep.forest = TRUE)
+  rf_model2 <- randomForest(trdata, trlabels, ntree = 10, nodesize = 25, keep.forest = TRUE)
+  rf_model3 <- randomForest(trdata, trlabels, ntree = 100, nodesize = 25, keep.forest = TRUE)
+
+  #predictions and error rates
+  predictions1<- predict(rf_model1,testdata2)
+  error_rate_2$number1[i] <- mean(predictions1 != testlabels2)
+  predictions2<- predict(rf_model2,testdata2)
+  error_rate_2$number2[i] <- mean(predictions2 != testlabels2)
+  predictions3<- predict(rf_model3,testdata2)
+  error_rate_2$number3[i] <- mean(predictions3 != testlabels2)
+
+}
+
+```
+
+#compute the mean and variance of error rates
+```{r example}
+mean_error_2[1]<- mean(error_rate_2$number1)
+mean_error_2[2]<- mean(error_rate_2$number2)
+mean_error_2[3]<- mean(error_rate_2$number3)
+
+var_error_2[1] <- var(error_rate_2$number1)
+var_error_2[2] <- var(error_rate_2$number2)
+var_error_2[3] <- var(error_rate_2$number3)
+
+```
+#change the conditions of x1/x3 and nodesize
+#build test datatest
+```{r example}
+set.seed(1234)
+x5 <- runif(1000)
+x6 <- runif(1000)
+testdata3 <- cbind(x5, x6)
+y3 <- as.numeric((x5<0.5 & x6<0.5) | (x5>0.5 & x6>0.5))
+testlabels3 <- as.factor(y3)
+```
+
+#build the train dataset for 1000 times with the size of 100
+```{r example}
+error_rate_3<- list(
+  number1 = rep(0,1000),
+  number2 = rep(0,1000),
+  number3 = rep(0,1000)
+)
+mean_error_3<- c()
+var_error_3<- c()
+for (i in 1:1000) {
+  x5 <- runif(100)
+  x6 <- runif(100)
+  trdata <- cbind(x5, x6)
+  y <- as.numeric((x5<0.5 & x6<0.5) | (x5>0.5 & x6>0.5))
+  trlabels <- as.factor(y)
+
+  #build the models
+  rf_model1 <- randomForest(trdata, trlabels, ntree = 1, nodesize = 12, keep.forest = TRUE)
+  rf_model2 <- randomForest(trdata, trlabels, ntree = 10, nodesize = 12, keep.forest = TRUE)
+  rf_model3 <- randomForest(trdata, trlabels, ntree = 100, nodesize = 12, keep.forest = TRUE)
+
+  #predictions and error rates
+  predictions1<- predict(rf_model1,testdata3)
+  error_rate_3$number1[i] <- mean(predictions1 != testlabels3)
+  predictions2<- predict(rf_model2,testdata3)
+  error_rate_3$number2[i] <- mean(predictions2 != testlabels3)
+  predictions3<- predict(rf_model3,testdata3)
+  error_rate_3$number3[i] <- mean(predictions3 != testlabels3)
+
+}
+
+```
+
+#compute the mean and variance of error rates
+```{r example}
+mean_error_3[1]<- mean(error_rate_3$number1)
+mean_error_3[2]<- mean(error_rate_3$number2)
+mean_error_3[3]<- mean(error_rate_3$number3)
+
+var_error_3[1] <- var(error_rate_3$number1)
+var_error_3[2] <- var(error_rate_3$number2)
+var_error_3[3] <- var(error_rate_3$number3)
+
+```
+
+#summary the results
+```{r example}
+result<- list(
+  mean_error_1 = mean_error_1,
+  mean_error_2 = mean_error_2,
+  mean_error_3 = mean_error_3,
+
+  var_error_1 = var_error_1,
+  var_error_2 = var_error_2,
+  var_error_3 = var_error_3
+)
+print(result)
+```
+
+As the number of trees in the random forest increases, the mean error rate decreases. This happens because:
+A random forest combines multiple decision trees. As more trees are added, the predictions are averaged, reducing the variance of the model.
+With more trees, the random forest effectively samples a larger variety of subsets from the training data. This increases the likelihood that the model captures the true underlying patterns.
+Thus, random forests are capable of capturing non-linear patterns effectively by aggregating multiple decision trees.
+Despite being more complex, the random forest performs better on the third dataset with sufficient trees because:
+With enough trees, the random forest can approximate complex decision boundaries like the one in the third dataset.
+The increased complexity of the third dataset provides a stronger signal for the model to learn from. This reduces the risk of the random forest overfitting, especially when the dataset is large and diverse.
+
+
+
+
+
