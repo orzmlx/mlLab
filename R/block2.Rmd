@@ -214,7 +214,7 @@ The increased complexity of the third dataset provides a stronger signal for the
 
 ## Assignment 2:MIXTURE MODELS
 
-In this assignment,we will chose different values of M,and compare compare their fit results.
+In this assignment,we will chose different values of M,and compare their fit results.
 
 ```{r Let's take K=3 for example}
 set.seed(1234567890)
@@ -255,8 +255,8 @@ mu
 for(it in 1:max_it) {
   plot(mu[1,], type="o", col="blue", ylim=c(0,1))
   points(mu[2,], type="o", col="red")
-  points(mu[3,], type="o", col="green")#This line should ignored if K=2 
-  #points(mu[4,], type="o", col="yellow")#This line should ignored if K=2 or k=3
+  points(mu[3,], type="o", col="green")#This line should be ignored if K=2 
+  #points(mu[4,], type="o", col="yellow")#This line should be ignored if K=2 or k=3
   Sys.sleep(0.5)
   
   # E-step: Computation of the weights
