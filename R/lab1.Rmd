@@ -545,7 +545,7 @@ Probability thresholds serve as the reference point for evaluating performance o
 
 In supervised learning problems, the target variables can be manually labelled by a domain expert.Target variables can also be labelled from predictive models based. Or the output is labelled naturally during the collection of training data. (Page 6, paragraph 2)
 
--   How can one express the cost function of the linear regression in the matrix form, according to the book? The cost function for the linear regression model can be written with matrix notations as (page 41): $$
+-   How can one express the cost function of the linear regression in the matrix form, according to the book? The cost function for the linear regression model can be written with matrix notations as (Page 41): $$
        J(𝜽)= \frac{1}{n}\sum_{i = 1}^{n}{(\hat{y}{(x_i;𝜽)} - y_i)^2}=\frac{1}{n}
        ||\hat{y}-y||^{2}_{2}=\frac{1}{n}||{X𝜽}-y||^{2}_{2}=\frac{1}{n}||∊||^{2}_{2}
     $$
