@@ -8,11 +8,6 @@ editor_options:
     wrap: 72
 ---
 
-```{r setup, include=FALSE}
-install.packages("randomForest")
-library(randomForest)
-```
-
 ## Introduction
 
 This is the lab for bock2 in the Machine Learning. In this lab, contains
@@ -356,7 +351,9 @@ which may have the risk of underfitting.
         of cluster increases from 1 to 4. But when it increases from 4
         to 5, the influence on objective is negligible. The 'bending
         point' is usually a good candidate of the cluster number. (Page
-        267)
+        267) 
 
--   ![Selection of number of components for unsupervised learning of
+-   
+
+    ![Selection of number of components for unsupervised learning of
     GMMs](images/Snipaste_2024-11-20_23-00-20.png)
