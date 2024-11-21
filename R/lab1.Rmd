@@ -11,6 +11,8 @@ html_document:
   theme: readable
   highlight: tango
 ---
+#Statement of Contribution
+In Assignment 1，Liuxi Mei was mainly responsible for code writing while Xiaochen Liu was responsible for the analyses. Assignment 2 was mainly contributed by Han Xia. In assignment 3, Liuxi Mei was responsible for code writing while Han Xia was responsible for the analysis. Assignment 4  was mainly contributed by Xiaochen Liu and Liuxi Mei. Results from all assignments have been discussed afterwards between Liuxi Mei, Xiaochen Liu and Han Xia and the group report was created based on this discussion.
 
 # Introduction
 
