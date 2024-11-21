@@ -1,28 +1,29 @@
 ---
-title: 'Lab1'
-author: 'liume102@student.liu.se'
-date: '12 Nov 2024'
+title: "Lab1"
+author: |
+  liume102@student.liu.se  
+  hanxi898@student.liu.se  
+  xiali125@student.liu.se
+date: "12 Nov 2024"
 output:
-html_document:
-  number_sections: true
-  toc: true
-  fig_width: 7
-  fig_height: 4.5
-  theme: readable
-  highlight: tango
+  pdf_document:
+    number_sections: true
+    fig_width: 7
+    fig_height: 4.5
+    highlight: tango
 ---
 # Statement of Contribution
 In Assignment 1, Xiaochen Liu was mainly responsible for code writing while Liuxi Mei was responsible for the analyes. Assignment 2 was mainly contributed by Han Xia. In assignment 3, Liuxi Mei was responsible for code writing while Han Xia was responsible for the analysis. Assignment 4  was mainly contributed by Xiaochen Liu and Liuxi Mei. Results from all assignments have been discussed afterwards between Liuxi Mei, Xiaochen Liu and Han Xia and the group report was created based on this discussion.
 
 # Introduction
 
-This is the first lab in the Machine Learning In this lab, contains the following tasks:1. Handwritten digit recognition with Knearest neighbors.2.Linear regression and ridge regression.3. Logistic regression and basis function expansion.4. Theory
+This is the first lab in the Machine Learning In this lab, contains the following tasks:1. Handwritten digit recognition with K-nearest neighbors.2.Linear regression and ridge regression.3. Logistic regression and basis function expansion.4. Theory
 
-# Assignment 1: Handwritten digit recognition with Knearest neighbors
+# Assignment 1: Handwritten digit recognition with K-nearest neighbors
 
 ## Load and check data
 
-```{r, message = FALSE}
+```{r, code1-1,message = FALSE}
 # Load packages
 library('ggplot2') # visualization
 library('ggthemes') # visualization
@@ -34,7 +35,7 @@ library('caret')
 
 Now that our packages are loaded and we divide it into training, validation and test sets (50%/25%/25%)
 
-```{r, message=FALSE, warning=FALSE}
+```{r, code1-2,message=FALSE, warning=FALSE}
 # do not use StringAsFact = FALSE
 digitals <- read.csv('../data/optdigits.csv',header = FALSE)
 # change all the columns to factor
@@ -53,7 +54,7 @@ cat("valid length:", nrow(test_digitals),'\n')
 
 ## KNN to fit classification model using train data
 
-```{r, message=FALSE, warning=FALSE}
+```{r, code1-3,message=FALSE, warning=FALSE}
 library(kknn)
 formula <- V65~.
 # if kenerl = 'rectangular' , so every point in the neighborhood is weighted equally
@@ -68,7 +69,7 @@ summary(knn_train_model)
 
 ## Predict on the test data
 
-```{r, message=FALSE, warning=FALSE}
+```{r, code1-4,message=FALSE, warning=FALSE}
 knn_test_model <- kknn(formula, train = train_digitals, test = test_digitals, k = 30, kernel = 'rectangular')
 print(length(knn_test_model$fitted.values))
 
@@ -76,7 +77,7 @@ print(length(knn_test_model$fitted.values))
 
 ## Confusion matrices and Misclassification errors for train data and test data
 
-```{r message=FALSE, warning=FALSE}
+```{r code1-5,message=FALSE, warning=FALSE}
 
 train_confusion <- table(train_digitals$V65, train_predictions)
 test_confusion <- table(test_digitals$V65, knn_test_model$fitted.values)
@@ -94,7 +95,7 @@ table(test_digitals$V65[1:10], knn_test_model$fitted.values[1:10])
 
 ## Filter 2 cases of digit “8” in the training data which were easiest to classify and 3 cases that were hardest to classify
 
-```{r message=FALSE, warning=FALSE}
+```{r code1-6,message=FALSE, warning=FALSE}
 # filter the digital '8'
 library(dplyr)
 
@@ -115,7 +116,7 @@ easy_cases_for_8 <- train_predict_8 %>% tail(2)
 
 we can see on the heatmap that the hardest cases are more complex than the easiest cases. Dark-colored squares concentrated in the middle of the matrix while the easiest cases are more concentrated on the edges which looking more like the number 8.
 
-```{r message=FALSE, warning=FALSE}
+```{r code1-7,message=FALSE, warning=FALSE}
 hardest_cases_index <- rownames(hardest_cases_for_8)
 est_cases_index <- rownames(easy_cases_for_8)
 # reindex the row index
@@ -143,7 +144,7 @@ heatmap(mat, Colv = NA, Rowv = NA, scale = "none", main = paste("Hard Case", i))
 
 according the plot , k = 3 is best value on training data and validation data, though the performance of k = 1 is better than k = 3 on training data, it is not the best value on validation data due to the weak generalization ability, but when we apply it on test data, its performance is not as good as predicted
 
-```{r message=FALSE, warning=FALSE}
+```{r code1-8,message=FALSE, warning=FALSE}
 library(ggplot2)
 train_error_rates <- list()
 valid_error_rates <- list()
@@ -183,7 +184,7 @@ legend("topright", legend = c("Training Error", "Validation Error","Test Error")
 
 ## Change mis-classification error to cross-entropy
 
-```{r message=FALSE, warning=FALSE}
+```{r code1-9,message=FALSE, warning=FALSE}
 valid_cross_entropy_errors <- list()
 train_cross_entropy_errors <- list()
 test_cross_entropy_errors <- list()
@@ -245,7 +246,7 @@ library(caret)
 
 Firstly, we read the file and divided the data into training and test data (60/40).
 
-```{r code}
+```{r code2-1}
 data <- read.csv("../data/parkinsons.csv") #
 set.seed(42)
 ini_sample<- sample(1:nrow(data),0.6*nrow(data))
@@ -255,7 +256,7 @@ test_data<- data[-ini_sample,]
 
 And then we scaled the dataset appropriately.
 
-```{r code}
+```{r code2-2}
 sacale_data<- train_data[,names(train_data)!="motor_UPDRS"]
 scale_para<- preProcess(sacale_data)
 train_data_scaled<- predict(scale_para,train_data)
@@ -268,7 +269,7 @@ test_data_scaled$motor_UPDRS <- test_data$motor_UPDRS
 
 Next, we computed a linear regression model , estimate training and test MSE
 
-```{r code}
+```{r code2-3}
 model<- lm(motor_UPDRS ~ .,train_data_scaled)
 train_prediction<- predict(model,train_data_scaled)
 train_mse<- mean((train_prediction - train_data_scaled$motor_UPDRS)^2)
@@ -281,7 +282,7 @@ Implement 4 following functions:
 
 loglikelihiid function that for a given parameter vector theta and dispersion sigma.
 
-```{r code}
+```{r code2-4}
 logLikelihood <- function(theta, sigma, x, y) {
   n <- length(y)
   predictions <- x %*% theta
@@ -293,7 +294,7 @@ logLikelihood <- function(theta, sigma, x, y) {
 
 Ridge function that for given vector theta, scalar sigma and scalar lambda and adds up a Ridge penalty to the minus loglikelihood.
 
-```{r code}
+```{r code2-5}
 ridge <- function(theta, sigma, lambda, x, y) {
   log_likelihood <- logLikelihood(theta, sigma, x, y)
   ridge_penalty <- lambda * sum(theta^2)
@@ -303,7 +304,7 @@ ridge <- function(theta, sigma, lambda, x, y) {
 
 Use function optim() with method=”BFGS” to find the optimal theta and sigma for the given lambda.
 
-```{r code}
+```{r code2-6}
 ridgeopt <- function(lambda, x, y) {
   n <- ncol(x)
   init_params <- c(rep(0, n), 1)  
@@ -321,7 +322,7 @@ ridgeopt <- function(lambda, x, y) {
 
 computes the degrees of freedom of the Ridge model based on the training data.
 
-```{r code}
+```{r code2-7}
 freedom_degree <- function(lambda, x) {
   xT <- t(x) %*% x
   heat <- solve(xT + lambda * diag(ncol(x))) %*% t(x)
@@ -334,7 +335,7 @@ freedom_degree <- function(lambda, x) {
 
 Finally, we can compute optimal theta parameters for different lambda values by using function RidgeOpt.
 
-```{r code}
+```{r code2-8}
 train_data2 <- as.matrix(train_data[,names(train_data)!="motor_UPDRS"])
 test_data2<- as.matrix(test_data[,names(test_data)!="motor_UPDRS"])
 train_value <- train_data$motor_UPDRS
@@ -381,7 +382,7 @@ In this example, under penalty parameter equals to 1, the model's train_mse2 and
 
 read data and give a scatter plot showing a Plasma glucose concentration on Age where observations are colored by Diabetes levels
 
-```{r message=FALSE, warning=FALSE}
+```{r code3-1,message=FALSE, warning=FALSE}
 
 diabetes <- read.csv('../data/pima-indians-diabetes.csv',header = FALSE)
 colnames(diabetes) <- c('Pregnancies','Plasma_glucose','blood_pressure','TricepsSkinFoldThickness','SerumInsulin','BMI','DiabetesPedigreeFunction','Age','Diabetes')
@@ -395,7 +396,7 @@ ggtitle("Scatterplot of Plasma Glucose vs Age by Diabetes Status")
 
 ## Train a logistic regression model when the threshold r = 0.5
 
-```{r message=FALSE, warning=FALSE}
+```{r code3-2,message=FALSE, warning=FALSE}
 
 formula <- Diabetes ~ Age + Plasma_glucose
 diabetes$Diabetes <- as.factor(diabetes$Diabetes)
@@ -432,7 +433,7 @@ cat(" training misclassification error:",error_rate)
 
 we can see that the logistic regression visually separates the two classes of diabetes status well, but the mis classification error is high due to the overlap of the two classes, maybe change 𝑟 can improve the performance.we will try later
 
-```{r message=FALSE, warning=FALSE}
+```{r code3-3,message=FALSE, warning=FALSE}
 
 ggplot(diabetes,aes( x = diabetes_pred$Age, y = diabetes_pred$Plasma_glucose, color = diabetes_pred$predict)) + geom_point()+
 labs(x = "Age", y = "Plasma Glucose Concentration", color = "Predicted Diabetes") +
@@ -443,7 +444,7 @@ ggtitle("Scatterplot of Plasma Glucose vs Age by Diabetes Status")
 
 we can see that the boundary line try to split the dots into two classes and put the most the red dots below the line and the most blue dots above the line, but when the age exceed the 50, the performance of the model is not good.it seems that the number of red dot below the boundary line is same as the number above the line, it results the high misclassification error
 
-```{r message=FALSE, warning=FALSE}
+```{r code3-4,message=FALSE, warning=FALSE}
 
 get_boundary_line <- function(gml_model,r, y_name) {
   coefficients <- gml_model$finalModel$coefficients
@@ -472,7 +473,7 @@ ggplot(diabetes,aes( x = diabetes$Age, y = diabetes$Plasma_glucose, color  = dia
 
 we can see that when r = 0.2, for the red dots , its TP is relatively high , but the Recall is low ,for the blue dots,its TP is lower than red dots, but the Recall is higher than red dots, it means that the model is more likely to predict the blue dots as the positive class, but the blue dots are more likely to be the negative class, it results in the high misclassification error, when r = 0.8, the model is more likely to predict the red dots as the positive class, but the red dots are more likely to be the negative class, it results in the high misclassification error
 
-```{r message=FALSE, warning=FALSE}
+```{r code3-5,message=FALSE, warning=FALSE}
 
 pred_res_0.2 <- classify_pred_res(0.2,gml_model)
 pred_res_0.8 <- classify_pred_res(0.8,gml_model)
@@ -481,7 +482,7 @@ pred_res_0.8 <- classify_pred_res(0.8,gml_model)
 
 ### plot the scatter when r = 0.2
 
-```{r message=FALSE, warning=FALSE}
+```{r code3-6,message=FALSE, warning=FALSE}
 
 boundary_parameter_0.2 <- get_boundary_line(gml_model,0.2,'Plasma_glucose')
 
@@ -499,7 +500,7 @@ ggtitle("Scatterplot of Plasma Glucose vs Age by raw diabetes Status")
 
 ### plot the scatter when r = 0.8
 
-```{r message=FALSE, warning=FALSE}
+```{r code3-7,message=FALSE, warning=FALSE}
 
 boundary_parameter_0.8 <- get_boundary_line(gml_model,0.8,'Plasma_glucose')
 
@@ -521,7 +522,7 @@ ggtitle("Scatterplot of Plasma Glucose vs Age by raw diabetes Status")
 
 we can see that after add the basis function expansion, the misclassification error is lower than the previous model, it means that the basis function expansion can improve the performance of the model, look at the coefficients furtherly, the new added variables slightly affect the prediction, it means that the new added variables affect the prediction positively and the decision boundary become from a line to a multidimensional graphics
 
-```{r message=FALSE, warning=FALSE}
+```{r code3-8,message=FALSE, warning=FALSE}
 diabetes$z1 <- diabetes$Plasma_glucose^4
 diabetes$z2 <- diabetes$Plasma_glucose^3 * diabetes$Age
 diabetes$z3 <- diabetes$Plasma_glucose^2 * diabetes$Age^2
