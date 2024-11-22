@@ -64,7 +64,8 @@ formula <- V65~.
 # both of the parameters of train and test use train_digital data
 # if  your predict columns is continuous, kknn will recognized as a regression task
 # under this situation, you can not get a probability of the prediction
-knn_train_model <- kknn(formula, train_digitals, train_digitals,  kernel = 'rectangular',distance = 1,)
+knn_train_model <- kknn(formula, train_digitals, train_digitals,  
+                        kernel = 'rectangular',distance = 1,)
 train_predictions <- fitted(knn_train_model)
 print(length(train_predictions))
 ```
@@ -72,7 +73,8 @@ print(length(train_predictions))
 ## Predict on the test data
 
 ```{r, code1-4,message=FALSE, warning=FALSE}
-knn_test_model <- kknn(formula, train = train_digitals, test = test_digitals, k = 30, kernel = 'rectangular')
+knn_test_model <- kknn(formula, train = train_digitals, test = test_digitals, 
+                       k = 30, kernel = 'rectangular')
 print(length(knn_test_model$fitted.values))
 
 ```
@@ -126,8 +128,12 @@ row.names(train_digitals) <- NULL
 full_hardest_cases <- train_digitals[hardest_cases_index,1:64]
 full_est_cases <- train_digitals[est_cases_index,1:64]
 
-hardest_matrixs <- lapply(1:nrow(full_hardest_cases), function(i) matrix(as.numeric(full_hardest_cases[i, , drop = FALSE]),nrow = 8,ncol = 8))
-est_matrixs <- lapply(1:nrow(full_est_cases), function(i) matrix(as.numeric(full_est_cases[i, , drop = FALSE]),nrow = 8,ncol = 8))
+hardest_matrixs <- lapply(1:nrow(full_hardest_cases), 
+  function(i) matrix(as.numeric(full_hardest_cases[i, , 
+                      drop = FALSE]),nrow = 8,ncol = 8))
+est_matrixs <- lapply(1:nrow(full_est_cases), 
+  function(i) matrix(as.numeric(full_est_cases[i, , 
+                      drop = FALSE]),nrow = 8,ncol = 8))
 
 for (i in 1:length(hardest_matrixs)) {
 mat <- hardest_matrixs[[i]]
@@ -154,10 +160,13 @@ test_error_rates <- list()
 
 for (ki in 1:30) {
 # cat(paste("current k:",ki,"\n",sep=""))
-train_ki_model <- kknn(formula, train = train_digitals, test = train_digitals, k = ki, kernel = 'rectangular')
-valid_ki_model <- kknn(formula, train = train_digitals, test = valid_digitals, k = ki, kernel = 'rectangular')
+train_ki_model <- kknn(formula, train = train_digitals, test = train_digitals, 
+                       k = ki, kernel = 'rectangular')
+valid_ki_model <- kknn(formula, train = train_digitals, test = valid_digitals, 
+                       k = ki, kernel = 'rectangular')
 
-test_ki_model <- kknn(formula, train = train_digitals, test = test_digitals, k = ki, kernel = 'rectangular')
+test_ki_model <- kknn(formula, train = train_digitals, test = test_digitals, 
+                      k = ki, kernel = 'rectangular')
 
 train_confusion <- table(train_digitals$V65, train_ki_model$fitted.values)
 valid_confusion <- table(valid_digitals$V65, valid_ki_model$fitted.values)
@@ -175,11 +184,14 @@ valid_error_rates[[ki]] <- 1 - valid_error_rate
 test_error_rates[[ki]] <- 1 - test_error_rate
 
 }
-plot(1:30, train_error_rates, type = "o", col = "blue", ylim = range(c(train_error_rates, valid_error_rates)),
- xlab = "Number of Neighbors (K)", ylab = "Mis-classification Error", main = "Training and Validation Errors")
+plot(1:30, train_error_rates, type = "o", col = "blue", 
+     ylim = range(c(train_error_rates, valid_error_rates)),
+ xlab = "Number of Neighbors (K)", ylab = "Mis-classification Error", 
+ main = "Training and Validation Errors")
 lines(1:30, valid_error_rates, type = "o", col = "red")
 lines(1:30, test_error_rates, type = "o", col = "green")
-legend("topright", legend = c("Training Error", "Validation Error","Test Error"), col = c("blue", "red","green"), lty = 1)
+legend("topright", legend = c("Training Error", "Validation Error","Test Error"), 
+       col = c("blue", "red","green"), lty = 1)
 # 
 
 ```
@@ -194,9 +206,12 @@ test_cross_entropy_errors <- list()
 for (ki in 1:30) {
 
   print(ki)
-  valid_ki_model <- kknn(formula, train = train_digitals, test = valid_digitals, k = ki, kernel = 'rectangular')
-  train_ki_model <- kknn(formula, train = train_digitals, test = train_digitals, k = ki, kernel = 'rectangular')
-  test_ki_model <- kknn(formula, train = train_digitals, test = test_digitals, k = ki, kernel = 'rectangular')
+  valid_ki_model <- kknn(formula, train = train_digitals, test = valid_digitals, 
+                         k = ki, kernel = 'rectangular')
+  train_ki_model <- kknn(formula, train = train_digitals, test = train_digitals, 
+                         k = ki, kernel = 'rectangular')
+  test_ki_model <- kknn(formula, train = train_digitals, test = test_digitals, 
+                        k = ki, kernel = 'rectangular')
   valid_probs <- valid_ki_model$prob
   train_probs <- train_ki_model$prob
   test_probs <- test_ki_model$prob
@@ -207,30 +222,40 @@ for (ki in 1:30) {
   
 # -1 means do not contain intercept
 # One-hot encoding
- #This type of matrix is typically used in machine learning and statistical modeling for feature      #engineering, particularly when converting categorical variables into dummy variables. 
+#This type of matrix is typically used in machine learning and statistical modeling for feature      
+#engineering, particularly when converting categorical variables into dummy variables. 
   valid_correct_class <- model.matrix(~V65 - 1, data = valid_digitals)  # One-hot encoding
   train_correct_class <- model.matrix(~V65 - 1, data = train_digitals)  # One-hot encoding
   test_correct_class <- model.matrix(~V65 - 1, data = test_digitals)  # One-hot encoding
   
-  valid_cross_entropy_errors[[ki]] <- -sum(valid_correct_class * valid_log_probs) / nrow(valid_digitals)
-  train_cross_entropy_errors[[ki]] <- -sum(train_correct_class * train_log_probs) / nrow(train_digitals)
-  test_cross_entropy_errors[[ki]] <- -sum(test_correct_class * test_log_probs) / nrow(test_digitals)
+  valid_cross_entropy_errors[[ki]] <- -sum(valid_correct_class 
+                                           * valid_log_probs) / nrow(valid_digitals)
+  train_cross_entropy_errors[[ki]] <- -sum(train_correct_class 
+                                           * train_log_probs) / nrow(train_digitals)
+  test_cross_entropy_errors[[ki]] <- -sum(test_correct_class 
+                                          * test_log_probs) / nrow(test_digitals)
   print(-sum(valid_correct_class * valid_log_probs) )
   print(-sum(train_correct_class * train_log_probs))
   print(-sum(test_correct_class * test_log_probs) )
 }
 
 
-# plot(1:30, train_error_rates, type = "o", col = "blue", ylim = range(c(train_error_rates, valid_error_rates)),
-#    xlab = "Number of Neighbors (K)", ylab = "Mis-classification Error", main = "Training and Validation Errors")
+# plot(1:30, train_error_rates, type = "o", col = "blue", 
+# ylim = range(c(train_error_rates, valid_error_rates)),
+#    xlab = "Number of Neighbors (K)", ylab = "Mis-classification Error", 
+# main = "Training and Validation Errors")
 # lines(1:30, valid_error_rates, type = "o", col = "red")
 # lines(1:30, test_error_rates, type = "o", col = "green")
-# legend("topright", legend = c("Training Error", "Validation Error","Test Error"), col = c("blue", "red","green"), lty = 1)
+# legend("topright", legend = c("Training Error", "Validation Error","Test Error"), 
+# col = c("blue", "red","green"), lty = 1)
 plot(1:30, valid_cross_entropy_errors, type = "o", col = "purple",
-   xlab = "Number of Neighbors (K)", ylab = "Cross-Entropy Error", main = "Validation Cross-Entropy Error")
+   xlab = "Number of Neighbors (K)", ylab = "Cross-Entropy Error", 
+   main = "Validation Cross-Entropy Error")
 lines(1:30, train_cross_entropy_errors, type = "o", col = "red")
 lines(1:30, test_cross_entropy_errors, type = "o", col = "green")
-legend("topright", legend = c("Training Cross-Entropy Error", "Validation Cross-Entropy Error","Test  Cross-Entropy Error"), col = c("red", "purple","green"), lty = 1)
+legend("topright", legend = c("Training Cross-Entropy Error", 
+                "Validation Cross-Entropy Error","Test  Cross-Entropy Error"), 
+       col = c("red", "purple","green"), lty = 1)
 ```
 
 # Assignment 2: Linear regression and ridge regression
@@ -289,7 +314,7 @@ logLikelihood <- function(theta, sigma, x, y) {
   n <- length(y)
   predictions <- x %*% theta
   residuals <- y - predictions
-  log_likelihood <- -0.5 * n * log(2 * pi * sigma^2) - (t(residuals) %*% residuals) / (2 * sigma^2)
+  log_likelihood <- -0.5 * n * log(2 * pi * sigma^2) - (t(residuals) %*% residuals)/ (2 * sigma^2)
   return(as.numeric(log_likelihood))
 }
 ```
@@ -389,8 +414,8 @@ read data and give a scatter plot showing a Plasma glucose concentration on Age 
 diabetes <- read.csv('../data/pima-indians-diabetes.csv',header = FALSE)
 colnames(diabetes) <- c('Pregnancies','Plasma_glucose','blood_pressure','TricepsSkinFoldThickness','SerumInsulin','BMI','DiabetesPedigreeFunction','Age','Diabetes')
 # 
-ggplot(diabetes,aes( x = diabetes$Age, y = diabetes$Plasma_glucose, color = diabetes$Diabetes)) + geom_point()+
-labs(x = "Age", y = "Plasma Glucose Concentration", color = "Diabetes") +
+ggplot(diabetes,aes( x = diabetes$Age, y = diabetes$Plasma_glucose, color = diabetes$Diabetes)) + 
+  geom_point()+labs(x = "Age", y = "Plasma Glucose Concentration", color = "Diabetes") +
 ggtitle("Scatterplot of Plasma Glucose vs Age by Diabetes Status")
 
 
@@ -410,7 +435,8 @@ gml_model <- caret::train(formula, data = diabetes, method = "glm", family = "bi
 classify_pred_res <- function(r,gml_model) {
 
   diabetes_pred <- predict(gml_model, type = "prob")
-  diabetes_pred$predict <- lapply(1:nrow(diabetes_pred), function(x) ifelse(diabetes_pred[x,2] > r, 1, 0))
+  diabetes_pred$predict <- lapply(1:nrow(diabetes_pred), 
+                      function(x) ifelse(diabetes_pred[x,2] > r, 1, 0))
   diabetes_pred$predict <- unlist(diabetes_pred$predict)
   diabetes_pred$raw <- diabetes$Diabetes
   diabetes_pred[, 3:4] <- lapply(diabetes_pred[, 3:4], as.factor)
@@ -437,7 +463,8 @@ we can see that the logistic regression visually separates the two classes of di
 
 ```{r code3-3,message=FALSE, warning=FALSE}
 
-ggplot(diabetes,aes( x = diabetes_pred$Age, y = diabetes_pred$Plasma_glucose, color = diabetes_pred$predict)) + geom_point()+
+ggplot(diabetes,aes( x = diabetes_pred$Age, y = diabetes_pred$Plasma_glucose,
+                     color = diabetes_pred$predict)) + geom_point()+
 labs(x = "Age", y = "Plasma Glucose Concentration", color = "Predicted Diabetes") +
 ggtitle("Scatterplot of Plasma Glucose vs Age by Diabetes Status")
 ```
@@ -466,7 +493,7 @@ get_boundary_line <- function(gml_model,r, y_name) {
 boundary_parameter <- get_boundary_line(gml_model,0.5,'Plasma_glucose')
 ggplot(diabetes,aes( x = diabetes$Age, y = diabetes$Plasma_glucose, color  = diabetes$Diabetes)) +
   geom_point()+
-  geom_abline(slope = boundary_parameter$Age, intercept = boundary_parameter$Intercept, color = "blue", linetype = "dashed") +
+  geom_abline(slope = boundary_parameter$Age, intercept = boundary_parameter$Intercept,color = "blue", linetype = "dashed") +
   labs(x = "Age", y = "Plasma Glucose Concentration", color = "Diabetes") +
   ggtitle("Scatterplot with Decision Boundary")
 ```
@@ -488,14 +515,19 @@ pred_res_0.8 <- classify_pred_res(0.8,gml_model)
 
 boundary_parameter_0.2 <- get_boundary_line(gml_model,0.2,'Plasma_glucose')
 
-ggplot(diabetes,aes( x = pred_res_0.2$Age, y = pred_res_0.2$Plasma_glucose, color = pred_res_0.2$predict)) + geom_point()+
-geom_abline(slope = boundary_parameter_0.2$Age, intercept = boundary_parameter_0.2$Intercept, color = "blue", linetype = "dashed") +
+ggplot(diabetes,aes( x = pred_res_0.2$Age, y = pred_res_0.2$Plasma_glucose, 
+         color = pred_res_0.2$predict)) + geom_point()+
+geom_abline(slope = boundary_parameter_0.2$Age, 
+intercept = boundary_parameter_0.2$Intercept, color = "blue", linetype = "dashed") +
 labs(x = "Age", y = "Plasma Glucose Concentration", color = "Predicted Diabetes") +
 ggtitle("Scatterplot of Plasma Glucose vs Age by predicted diabetes Status")
 
 
-ggplot(diabetes,aes( x = pred_res_0.2$Age, y = pred_res_0.2$Plasma_glucose, color = pred_res_0.2$raw)) + geom_point()+
-geom_abline(slope = boundary_parameter_0.2$Age, intercept = boundary_parameter_0.2$Intercept, color = "blue", linetype = "dashed") +
+ggplot(diabetes,aes( x = pred_res_0.2$Age, y = pred_res_0.2$Plasma_glucose, 
+                     color = pred_res_0.2$raw)) + geom_point()+
+geom_abline(slope = boundary_parameter_0.2$Age, 
+          intercept = boundary_parameter_0.2$Intercept, 
+          color = "blue", linetype = "dashed") +
 labs(x = "Age", y = "Plasma Glucose Concentration", color = "Predicted Diabetes") +
 ggtitle("Scatterplot of Plasma Glucose vs Age by raw diabetes Status")
 ```
@@ -506,14 +538,20 @@ ggtitle("Scatterplot of Plasma Glucose vs Age by raw diabetes Status")
 
 boundary_parameter_0.8 <- get_boundary_line(gml_model,0.8,'Plasma_glucose')
 
-ggplot(diabetes,aes( x = pred_res_0.8$Age, y = pred_res_0.8$Plasma_glucose, color = pred_res_0.8$predict)) + geom_point()+
-geom_abline(slope = boundary_parameter_0.8$Age, intercept = boundary_parameter_0.8$Intercept, color = "blue", linetype = "dashed") +
+ggplot(diabetes,aes( x = pred_res_0.8$Age, y = pred_res_0.8$Plasma_glucose,
+                     color = pred_res_0.8$predict)) + geom_point()+
+geom_abline(slope = boundary_parameter_0.8$Age, 
+          intercept = boundary_parameter_0.8$Intercept, 
+          color = "blue", linetype = "dashed") +
 labs(x = "Age", y = "Plasma Glucose Concentration", color = "Predicted Diabetes") +
 ggtitle("Scatterplot of Plasma Glucose vs Age by predicted diabetes Status")
 
 
-ggplot(diabetes,aes( x = pred_res_0.8$Age, y = pred_res_0.8$Plasma_glucose, color = pred_res_0.8$raw)) + geom_point()+
-geom_abline(slope = boundary_parameter_0.8$Age, intercept = boundary_parameter_0.8$Intercept, color = "blue", linetype = "dashed") +
+ggplot(diabetes,aes( x = pred_res_0.8$Age, y = pred_res_0.8$Plasma_glucose, 
+                     color = pred_res_0.8$raw)) + geom_point()+
+geom_abline(slope = boundary_parameter_0.8$Age, 
+            intercept = boundary_parameter_0.8$Intercept, 
+            color = "blue", linetype = "dashed") +
 labs(x = "Age", y = "Plasma Glucose Concentration", color = "Predicted Diabetes") +
 ggtitle("Scatterplot of Plasma Glucose vs Age by raw diabetes Status")
 
