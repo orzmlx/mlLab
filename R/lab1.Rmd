@@ -67,7 +67,6 @@ formula <- V65~.
 knn_train_model <- kknn(formula, train_digitals, train_digitals,  kernel = 'rectangular',distance = 1,)
 train_predictions <- fitted(knn_train_model)
 print(length(train_predictions))
-summary(knn_train_model)
 ```
 
 ## Predict on the test data
