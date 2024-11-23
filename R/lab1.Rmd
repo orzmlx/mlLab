@@ -6,12 +6,12 @@ author: |
   xiali125@student.liu.se
 date: "12 Nov 2024"
 output:
-  pdf_document:
+  pdf_document: 
     latex_engine: xelatex
     number_sections: true
     fig_width: 7
-    fig_height: 4.5
     highlight: tango
+    toc: true
 ---
 
 # Statement of Contribution
@@ -592,9 +592,10 @@ In supervised learning problems, the target variables can be manually labelled b
        J(𝜽)= \frac{1}{n}\sum_{i = 1}^{n}{(\hat{y}{(x_i;𝜽)} - y_i)^2}=\frac{1}{n}
        ||\hat{y}-y||^{2}_{2}=\frac{1}{n}||{X𝜽}-y||^{2}_{2}=\frac{1}{n}||∊||^{2}_{2}
     $$
+    
 # Appendix(Code)
 
-```{r, appendix}
+```{r, eval=FALSE}
 # Load packages
 library('ggplot2') # visualization
 library('ggthemes') # visualization
