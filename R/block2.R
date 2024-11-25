@@ -7,8 +7,12 @@ set.seed(1234)
 x1 <- runif(1000)
 x2 <- runif(1000)
 testdata <- cbind(x1, x2)
-y <- as.numeric(x1 < x2)
-testlabels <- as.factor(y)
+y1 <- as.numeric(x1 < x2)
+testlabels <- as.factor(y1)
+y2 <- as.numeric(x1 < 0.5)
+testlabels2 <- as.factor(y2)
+y3 <- as.numeric((x1<0.5 & x2<0.5) | (x1>0.5 & x2>0.5))
+testlabels3 <- as.factor(y3)
 
 #build the train dataset for 1000 times with the size of 100
 
@@ -54,12 +58,9 @@ var_error_1[3] <- var(error_rate_1$number3)
 
 #change the conditions of x1/x3
 #build test datatest
-set.seed(1234)
-x3 <- runif(1000)
-x4 <- runif(1000)
-testdata2 <- cbind(x3, x4)
-y2 <- as.numeric(x3 < 0.5)
-testlabels2 <- as.factor(y2)
+
+#y2 <- as.numeric(x1 < 0.5)
+#testlabels2 <- as.factor(y2)
 
 #build the train dataset for 1000 times with the size of 100
 
@@ -71,10 +72,10 @@ error_rate_2<- list(
 mean_error_2<- c()
 var_error_2<- c()
 for (i in 1:1000) {
-  x3 <- runif(100)
-  x4 <- runif(100)
-  trdata <- cbind(x3, x4)
-  y <- as.numeric(x3 < 0.5)
+  x1 <- runif(100)
+  x2 <- runif(100)
+  trdata <- cbind(x1, x2)
+  y <- as.numeric(x1 < 0.5)
   trlabels <- as.factor(y)
 
   #build the models
@@ -83,11 +84,11 @@ for (i in 1:1000) {
   rf_model3 <- randomForest(trdata, trlabels, ntree = 100, nodesize = 25, keep.forest = TRUE)
 
   #predictions and error rates
-  predictions1<- predict(rf_model1,testdata2)
+  predictions1<- predict(rf_model1,testdata)
   error_rate_2$number1[i] <- mean(predictions1 != testlabels2)
-  predictions2<- predict(rf_model2,testdata2)
+  predictions2<- predict(rf_model2,testdata)
   error_rate_2$number2[i] <- mean(predictions2 != testlabels2)
-  predictions3<- predict(rf_model3,testdata2)
+  predictions3<- predict(rf_model3,testdata)
   error_rate_2$number3[i] <- mean(predictions3 != testlabels2)
 
 }
@@ -103,12 +104,10 @@ var_error_2[3] <- var(error_rate_2$number3)
 
 #change the conditions of x1/x3 and nodesize
 #build test datatest
-set.seed(1234)
-x5 <- runif(1000)
-x6 <- runif(1000)
-testdata3 <- cbind(x5, x6)
-y3 <- as.numeric((x5<0.5 & x6<0.5) | (x5>0.5 & x6>0.5))
-testlabels3 <- as.factor(y3)
+
+
+#y3 <- as.numeric((x1<0.5 & x2<0.5) | (x1>0.5 & x2>0.5))
+#testlabels3 <- as.factor(y3)
 
 #build the train dataset for 1000 times with the size of 100
 
@@ -122,8 +121,8 @@ var_error_3<- c()
 for (i in 1:1000) {
   x5 <- runif(100)
   x6 <- runif(100)
-  trdata <- cbind(x5, x6)
-  y <- as.numeric((x5<0.5 & x6<0.5) | (x5>0.5 & x6>0.5))
+  trdata <- cbind(x1, x2)
+  y <- as.numeric((x1<0.5 & x2<0.5) | (x1>0.5 & x2>0.5))
   trlabels <- as.factor(y)
 
   #build the models
@@ -132,11 +131,11 @@ for (i in 1:1000) {
   rf_model3 <- randomForest(trdata, trlabels, ntree = 100, nodesize = 12, keep.forest = TRUE)
 
   #predictions and error rates
-  predictions1<- predict(rf_model1,testdata3)
+  predictions1<- predict(rf_model1,testdata)
   error_rate_3$number1[i] <- mean(predictions1 != testlabels3)
-  predictions2<- predict(rf_model2,testdata3)
+  predictions2<- predict(rf_model2,testdata)
   error_rate_3$number2[i] <- mean(predictions2 != testlabels3)
-  predictions3<- predict(rf_model3,testdata3)
+  predictions3<- predict(rf_model3,testdata)
   error_rate_3$number3[i] <- mean(predictions3 != testlabels3)
 
 }
@@ -160,6 +159,7 @@ result<- list(
   var_error_3 = var_error_3
 )
 print(result)
+
 
 #' As the number of trees in the random forest increases, the mean error rate decreases. This happens because:
 #' A random forest combines multiple decision trees. As more trees are added, the predictions are averaged, reducing the variance of the model.
@@ -191,7 +191,7 @@ for(i in 1:n) {
     x[i,d] <- rbinom(1,1,true_mu[m,d])
   }
 }
-M=3 # number of clusters
+M=4 # number of clusters
 w <- matrix(nrow=n, ncol=M) # weights
 pi <- vector(length = M) # mixing coefficients
 mu <- matrix(nrow=M, ncol=D) # conditional distributions
@@ -208,7 +208,7 @@ for(it in 1:max_it) {
   plot(mu[1,], type="o", col="blue", ylim=c(0,1))
   points(mu[2,], type="o", col="red")
   points(mu[3,], type="o", col="green")
-  #points(mu[4,], type="o", col="yellow")
+  points(mu[4,], type="o", col="yellow")
   Sys.sleep(0.5)
   # E-step: Computation of the weights
   # Your code here
