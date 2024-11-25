@@ -222,15 +222,7 @@ for(it in 1:max_it) {
     }
   }
 
-  #M-step: ML parameter estimation from the data and weights
-  # Your code here
 
-  for (m in 1:M) {
-    pi[m] <- sum(w[, m]) / n
-    for (d in 1:D) {
-      mu[m, d] <- sum(w[, m] * x[, d]) / sum(w[, m])
-    }
-  }
   #Log likelihood computation.
   # Your code here
 
@@ -247,6 +239,15 @@ for(it in 1:max_it) {
   if (it > 1 && abs(llik[it] - llik[it - 1]) < min_change) {
     cat("Converged at iteration", it, "\n")
     break
+  }
+  #M-step: ML parameter estimation from the data and weights
+  # Your code here
+
+  for (m in 1:M) {
+    pi[m] <- sum(w[, m]) / n
+    for (d in 1:D) {
+      mu[m, d] <- sum(w[, m] * x[, d]) / sum(w[, m])
+    }
   }
 }
 pi
