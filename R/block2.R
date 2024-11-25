@@ -1,58 +1,21 @@
----
-title: "block2"
-author: |
-  liume102@student.liu.se  
-  hanxi898@student.liu.se  
-  xiali125@student.liu.se
-date: "2024-11-18"
-output:
-  pdf_document: 
-    latex_engine: xelatex
-    number_sections: true
-    fig_width: 7
-    highlight: tango
-    toc: true
-editor_options: 
-  markdown: 
-    wrap: 72
----
 
-## Introduction
-
-This is the lab for bock2 in the Machine Learning. In this lab, contains
-the following tasks:1. ENSEMBLE METHODS.2.MIXTURE MODELS.3. Theory
-
-```{r setup, include=FALSE}
-Sys.setlocale("LC_ALL", "sv_SE.UTF-8")
-options(repos = c(CRAN = "https://cran.r-project.org"))
-```
-# Assignment 1:ENSEMBLE METHODS
-
-We need to download the package before the start.
-
-```{r install packages}
 install.packages("randomForest")
 library(randomForest)
-```
 
 #build test datatest
-
-```{r dataset}
 set.seed(1234)
 x1 <- runif(1000)
 x2 <- runif(1000)
 testdata <- cbind(x1, x2)
 y <- as.numeric(x1 < x2)
 testlabels <- as.factor(y)
-```
 
 #build the train dataset for 1000 times with the size of 100
-create 1000 training datasets of size 100, learn a random forest from each dataset, and compute the misclassification error in the same test dataset of size 1000. Report results for when the random forest has 1, 10 and 100 trees.
-```{r example 1-1}
+
 error_rate_1<- list(
   number1 = rep(0,1000),
-  number1 = rep(0,1000),
-  number1 = rep(0,1000)
+  number2 = rep(0,1000),
+  number3 = rep(0,1000)
 )
 mean_error_1<- c()
 var_error_1<- c()
@@ -62,9 +25,8 @@ for (i in 1:1000) {
   trdata <- cbind(x1, x2)
   y <- as.numeric(x1 < x2)
   trlabels <- as.factor(y)
-  
+
   #build the models
-  
   rf_model1 <- randomForest(trdata, trlabels, ntree = 1, nodesize = 25, keep.forest = TRUE)
   rf_model2 <- randomForest(trdata, trlabels, ntree = 10, nodesize = 25, keep.forest = TRUE)
   rf_model3 <- randomForest(trdata, trlabels, ntree = 100, nodesize = 25, keep.forest = TRUE)
@@ -78,11 +40,8 @@ for (i in 1:1000) {
   error_rate_1$number3[i] <- mean(predictions3 != testlabels)
 
 }
-```
 
 #compute the mean and variance of error rates
-
-```{r example 1-2}
 mean_error_1[1]<- mean(error_rate_1$number1)
 mean_error_1[2]<- mean(error_rate_1$number2)
 mean_error_1[3]<- mean(error_rate_1$number3)
@@ -91,25 +50,19 @@ var_error_1[1] <- var(error_rate_1$number1)
 var_error_1[2] <- var(error_rate_1$number2)
 var_error_1[3] <- var(error_rate_1$number3)
 
-```
 
-Then, we can change the condition,and the calculation is the same as
-before.
 
-#change the conditions of x1/x3 #build test datatest
-
-```{r example 1-3}
+#change the conditions of x1/x3
+#build test datatest
 set.seed(1234)
 x3 <- runif(1000)
 x4 <- runif(1000)
 testdata2 <- cbind(x3, x4)
 y2 <- as.numeric(x3 < 0.5)
 testlabels2 <- as.factor(y2)
-```
 
 #build the train dataset for 1000 times with the size of 100
 
-```{r example 1-4}
 error_rate_2<- list(
   number1 = rep(0,1000),
   number2 = rep(0,1000),
@@ -139,11 +92,7 @@ for (i in 1:1000) {
 
 }
 
-```
-
 #compute the mean and variance of error rates
-
-```{r example 1-5}
 mean_error_2[1]<- mean(error_rate_2$number1)
 mean_error_2[2]<- mean(error_rate_2$number2)
 mean_error_2[3]<- mean(error_rate_2$number3)
@@ -152,22 +101,17 @@ var_error_2[1] <- var(error_rate_2$number1)
 var_error_2[2] <- var(error_rate_2$number2)
 var_error_2[3] <- var(error_rate_2$number3)
 
-```
-
-#change the conditions of x1/x3 and nodesize #build test datatest
-
-```{r example 1-6}
+#change the conditions of x1/x3 and nodesize
+#build test datatest
 set.seed(1234)
 x5 <- runif(1000)
 x6 <- runif(1000)
 testdata3 <- cbind(x5, x6)
 y3 <- as.numeric((x5<0.5 & x6<0.5) | (x5>0.5 & x6>0.5))
 testlabels3 <- as.factor(y3)
-```
 
 #build the train dataset for 1000 times with the size of 100
 
-```{r example 1-7}
 error_rate_3<- list(
   number1 = rep(0,1000),
   number2 = rep(0,1000),
@@ -197,11 +141,7 @@ for (i in 1:1000) {
 
 }
 
-```
-
 #compute the mean and variance of error rates
-
-```{r example 1-8}
 mean_error_3[1]<- mean(error_rate_3$number1)
 mean_error_3[2]<- mean(error_rate_3$number2)
 mean_error_3[3]<- mean(error_rate_3$number3)
@@ -210,11 +150,6 @@ var_error_3[1] <- var(error_rate_3$number1)
 var_error_3[2] <- var(error_rate_3$number2)
 var_error_3[3] <- var(error_rate_3$number3)
 
-```
-
-#summary the results
-
-```{r example 1-9}
 result<- list(
   mean_error_1 = mean_error_1,
   mean_error_2 = mean_error_2,
@@ -225,31 +160,15 @@ result<- list(
   var_error_3 = var_error_3
 )
 print(result)
-```
 
-As the number of trees in the random forest increases, the mean error
-rate decreases. This happens because: A random forest combines multiple
-decision trees. As more trees are added, the predictions are averaged,
-reducing the variance of the model. With more trees, the random forest
-effectively samples a larger variety of subsets from the training data.
-This increases the likelihood that the model captures the true
-underlying patterns. Thus, random forests are capable of capturing
-non-linear patterns effectively by aggregating multiple decision trees.
-Despite being more complex, the random forest performs better on the
-third dataset with sufficient trees because: With enough trees, the
-random forest can approximate complex decision boundaries like the one
-in the third dataset. The increased complexity of the third dataset
-provides a stronger signal for the model to learn from. This reduces the
-risk of the random forest overfitting, especially when the dataset is
-large and diverse.
+#' As the number of trees in the random forest increases, the mean error rate decreases. This happens because:
+#' A random forest combines multiple decision trees. As more trees are added, the predictions are averaged, reducing the variance of the model.
+#' With more trees, the random forest effectively samples a larger variety of subsets from the training data. This increases the likelihood that the model captures the true underlying patterns
+#' Random forests are capable of capturing non-linear patterns effectively by aggregating multiple decision trees.
+#' Despite being more complex, the random forest performs better on the third dataset with sufficient trees because:
+#' With enough trees, the random forest can approximate complex decision boundaries like the one in the third dataset.
+#' The increased complexity of the third dataset provides a stronger signal for the model to learn from. This reduces the risk of the random forest overfitting to noise, especially when the dataset is large and diverse.
 
-## Assignment 2:MIXTURE MODELS
-
-In this assignment,we will chose different values of M,and compare their
-fit results.
-
-```{r}
-# Let's take K=3 for example
 set.seed(1234567890)
 max_it <- 100 # max number of EM iterations
 min_change <- 0.1 # min change in log lik between two consecutive iterations
@@ -272,7 +191,7 @@ for(i in 1:n) {
     x[i,d] <- rbinom(1,1,true_mu[m,d])
   }
 }
-M=3 # number of clusters,it can be changed to 2 or 4
+M=3 # number of clusters
 w <- matrix(nrow=n, ncol=M) # weights
 pi <- vector(length = M) # mixing coefficients
 mu <- matrix(nrow=M, ncol=D) # conditional distributions
@@ -288,11 +207,11 @@ mu
 for(it in 1:max_it) {
   plot(mu[1,], type="o", col="blue", ylim=c(0,1))
   points(mu[2,], type="o", col="red")
-  points(mu[3,], type="o", col="green")#This line should be ignored if K=2 
-  #points(mu[4,], type="o", col="yellow")#This line should be ignored if K=2 or k=3
+  points(mu[3,], type="o", col="green")
+  #points(mu[4,], type="o", col="yellow")
   Sys.sleep(0.5)
-  
   # E-step: Computation of the weights
+  # Your code here
   for (i in 1:n) {
     for (m in 1:M) {
       numerator <- pi[m] * prod(mu[m, ]^x[i, ] * (1 - mu[m, ])^(1 - x[i, ]))
@@ -304,14 +223,17 @@ for(it in 1:max_it) {
   }
 
   #M-step: ML parameter estimation from the data and weights
+  # Your code here
+
   for (m in 1:M) {
     pi[m] <- sum(w[, m]) / n
     for (d in 1:D) {
       mu[m, d] <- sum(w[, m] * x[, d]) / sum(w[, m])
     }
   }
-  
   #Log likelihood computation.
+  # Your code here
+
   llik[it] <- sum(sapply(1:n, function(i) {
     log(sum(sapply(1:M, function(m) {
       pi[m] * prod(mu[m, ]^x[i, ] * (1 - mu[m, ])^(1 - x[i, ]))
@@ -320,8 +242,8 @@ for(it in 1:max_it) {
 
   cat("iteration: ", it, "log likelihood: ", llik[it], "\n")
   flush.console()
-  
   # Stop if the lok likelihood has not changed significantly
+  # Your code here
   if (it > 1 && abs(llik[it] - llik[it - 1]) < min_change) {
     cat("Converged at iteration", it, "\n")
     break
@@ -330,44 +252,3 @@ for(it in 1:max_it) {
 pi
 mu
 plot(llik[1:it], type="o")
-```
-
-We can get results for different K values.According to the mu value,
-when M=3, the model fits the true structure of the data well (the data
-is generated from 3 components), so the clustering and mean estimates
-are close to the true value. When M=4, mu[1,] and mu[2,] are close to
-the true value mu[3,], which may have the risk of overfitting; when M=2,
-the true distribution of the data (3 clusters) cannot be well matched,
-which may have the risk of underfitting.
-
-## Assignment 3:MIXTURE MODELS
-
--   In an ensemble model, is it true that the larger the number B of
-    ensemble members the more ﬂexible the ensemble model?
-
-    -   No, more ensemble members does not make the resulting model more
-        flexible but only reduces the variance.( page 169)
-
--   In AdaBoost, what is the loss function used to train the boosted
-    classiﬁer at each iteration?
-
-    -   The loss fucntion is the exponential loss function below (page
-        177): $$
-         L(y \cdot f(x)) = \exp(-y \cdot f(x)) 
-        $$
-
--   Sketch how you would use cross-validation to select the number of
-    components (or clusters) in unsupervised learning of GMMs.
-
-    -   Cluster number M is chosen when the benefit from choosing M+1
-        clusters is insignificant. By looking into the case provided by
-        course book, the objective drops significantly when the number
-        of cluster increases from 1 to 4. But when it increases from 4
-        to 5, the influence on objective is negligible. The 'bending
-        point' is usually a good candidate of the cluster number. (Page
-        267) 
-
--   
-
-    ![Selection of number of components for unsupervised learning of
-    GMMs](images/Snipaste_2024-11-20_23-00-20.png)
