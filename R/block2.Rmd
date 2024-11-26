@@ -1,10 +1,10 @@
 ---
-title: "block2"
+title: "Block2 Group A2"
 author: |
   liume102@student.liu.se  
   hanxi898@student.liu.se  
   xiali125@student.liu.se
-date: "2024-11-18"
+date: "2024-11-26"
 output:
   pdf_document: 
     latex_engine: xelatex
@@ -20,23 +20,27 @@ editor_options:
 ## Introduction
 
 This is the lab for bock2 in the Machine Learning. In this lab, contains
-the following tasks:1. ENSEMBLE METHODS.2.MIXTURE MODELS.3. Theory
+the following tasks:1. ENSEMBLE METHODS.2.MIXTURE MODELS.3. Theory.
 
 ```{r setup, include=FALSE}
 Sys.setlocale("LC_ALL", "sv_SE.UTF-8")
 options(repos = c(CRAN = "https://cran.r-project.org"))
 ```
-# Assignment 1:ENSEMBLE METHODS
 
-We need to download the package before the start.
+## Assignment 1:ENSEMBLE METHODS
 
-```{r install packages}
+
+```{r include=FALSE}
 install.packages("randomForest")
 library(randomForest)
 ```
 
-#build test datatest
-First of all, we fixed the data of the test set to avoid the result error caused by the difference of the test set in the subsequent calculation process.
+#build test data set
+
+First of all, we fixed the data of the test set to avoid the result
+error caused by the difference of the test set in the subsequent
+calculation process.
+
 ```{r dataset}
 set.seed(1234)
 x1 <- runif(1000)
@@ -50,8 +54,13 @@ y3 <- as.numeric((x1<0.5 & x2<0.5) | (x1>0.5 & x2>0.5))
 testlabels3 <- as.factor(y3)
 ```
 
-#build the train dataset for 1000 times with the size of 100
-Create 1000 training datasets of size 100, learn a random forest from each dataset, and compute the misclassification error in the same test dataset of size 1000. Report results for when the random forest has 1, 10 and 100 trees.
+#build the train data set for 1000 times with the size of 100
+
+Create 1000 training data sets of size 100, learn a random forest from
+each data set, and compute the classification error in the same test
+data set of size 1000. Report results for when the random forest has 1,
+10 and 100 trees.
+
 ```{r example 1-1}
 error_rate_1<- list(
   number1 = rep(0,1000),
@@ -99,11 +108,10 @@ var_error_1[3] <- var(error_rate_1$number3)
 Then, we can change the condition,and the calculation is the same as
 before.
 
-#change the conditions of x1/x3 
+#repeat for the conditions (x1\<0.5) for 1,10,100 trees, the results are
+summarized in mean_error_2 and var_error_2.
 
-#build the train dataset for 1000 times with the size of 100
-
-```{r example 1-4}
+```{r include=FALSE}
 error_rate_2<- list(
   number1 = rep(0,1000),
   number2 = rep(0,1000),
@@ -135,9 +143,7 @@ for (i in 1:1000) {
 
 ```
 
-#compute the mean and variance of error rates
-
-```{r example 1-5}
+```{r include=FALSE}
 mean_error_2[1]<- mean(error_rate_2$number1)
 mean_error_2[2]<- mean(error_rate_2$number2)
 mean_error_2[3]<- mean(error_rate_2$number3)
@@ -148,11 +154,11 @@ var_error_2[3] <- var(error_rate_2$number3)
 
 ```
 
-#change the conditions of x1/x3 and nodesize 
+#repeat for the conditions ((x1\<0.5 & x2\<0.5) \| (x1\>0.5 & x2\>0.5))
+and node size 12 for 1,10,100 trees, the results are summarized in
+mean_error_3 and var_error_3.
 
-#build the train dataset for 1000 times with the size of 100
-
-```{r example 1-7}
+```{r include=FALSE}
 error_rate_3<- list(
   number1 = rep(0,1000),
   number2 = rep(0,1000),
@@ -184,9 +190,7 @@ for (i in 1:1000) {
 
 ```
 
-#compute the mean and variance of error rates
-
-```{r example 1-8}
+```{r include=FALSE}
 mean_error_3[1]<- mean(error_rate_3$number1)
 mean_error_3[2]<- mean(error_rate_3$number2)
 mean_error_3[3]<- mean(error_rate_3$number3)
@@ -212,17 +216,37 @@ result<- list(
 print(result)
 ```
 
-As the number of trees in the random forest increases, the mean error rate decreases. This happens because: a random forest combines multiple decision trees. As more trees are added, the predictions are averaged, reducing the variance of the model. With more trees, the random forest effectively samples a larger variety of subsets from the training data. This increases the likelihood that the model captures the true
-underlying patterns. 
-Despite being more complex, the random forest performs better on the third dataset with sufficient trees because: the third dataset is more complex and may contain multiple non-linear boundaries or classes that are more difficult to distinguish. In this case, a single tree may not be enough to capture all the complex patterns, and increasing the number of trees can provide more decision rules, thereby improving the performance of the model. More trees can improve the generalization ability of the model in an integrated way.
+#### Questions:
+
+#### What happens with the mean error rate when the number of trees in the random forest grows? Why?
+
+As the number of trees in the random forest increases, the mean error
+rate decreases. This happens because: a random forest combines multiple
+decision trees. As more trees are added, the predictions are averaged,
+reducing the variance of the model. With more trees, the random forest
+effectively samples a larger variety of subsets from the training data.
+This increases the likelihood that the model captures the true
+underlying patterns.
+
+#### The third data set represents a slightly more complicated classiﬁcation problem than the ﬁrst one. Still, you should get better performance for it when using sufﬁcient trees in the random forest. Explain why you get better performance.
+
+Despite being more complex, the random forest performs better on the
+third data set with sufficient trees because: the third data set is more
+complex and may contain multiple non-linear boundaries or classes that
+are more difficult to distinguish. In this case, a single tree may not
+be enough to capture all the complex patterns, and increasing the number
+of trees can provide more decision rules, thereby improving the
+performance of the model. More trees can improve the generalization
+ability of the model in an integrated way.
 
 ## Assignment 2:MIXTURE MODELS
 
 In this assignment,we will chose different values of M,and compare their
 fit results.The E and M steps are calculated as follows:
-![EM-step](images/EM.png)
-and the formula for calculating the log-likelihood value  is as follows:
+![EM-step](images/EM.png) and the formula for calculating the
+log-likelihood value is as follows:
 ![loglikelihood](images/log-likelihood.png)
+
 ```{r}
 # Let's take K=3 for example
 set.seed(1234567890)
@@ -306,7 +330,20 @@ mu
 plot(llik[1:it], type="o")
 ```
 
-We can get results for different K values.When M is equal to 2, the coefficient (pi) approaches 0.5, meaning that the two clusters contribute nearly equally to the data. Although there are significant differences in the conditional distribution (mu) on each dimension,there is a big deviation from the true value, resulting in underfitting.When M is equal to 3, the convergence rate is slightly slower than when M is equal to 2, but the mu is more dispersed and closer to the true value, which can accurately capture the true structure of the data without being overly complicated.When M is equal to 4, the log-likelihood converges at the 44th iteration, and the convergence speed is the slowest, which indicates that the complexity of the model is significantly increased, and the weight of some clusters (such as pi1 and pi2) is very small, which indicates that the data may be unnecessarily split and overfitting may occur.
+We can get results for different K values.When M is equal to 2, the
+coefficient (pi) approaches 0.5, meaning that the two clusters
+contribute nearly equally to the data. Although there are significant
+differences in the conditional distribution (mu) on each dimension,there
+is a big deviation from the true value, resulting in underfitting.When M
+is equal to 3, the convergence rate is slightly slower than when M is
+equal to 2, but the mu is more dispersed and closer to the true value,
+which can accurately capture the true structure of the data without
+being overly complicated.When M is equal to 4, the log-likelihood
+converges at the 44th iteration, and the convergence speed is the
+slowest, which indicates that the complexity of the model is
+significantly increased, and the weight of some clusters (such as pi1
+and pi2) is very small, which indicates that the data may be
+unnecessarily split and overfitting may occur.
 
 ## Assignment 3:MIXTURE MODELS
 
@@ -333,9 +370,7 @@ We can get results for different K values.When M is equal to 2, the coefficient 
         of cluster increases from 1 to 4. But when it increases from 4
         to 5, the influence on objective is negligible. The 'bending
         point' is usually a good candidate of the cluster number. (Page
-        267) 
-
--   
+        267）
 
     ![Selection of number of components for unsupervised learning of
     GMMs](images/Snipaste_2024-11-20_23-00-20.png)
