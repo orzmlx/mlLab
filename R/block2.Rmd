@@ -36,7 +36,7 @@ library(randomForest)
 ```
 
 #build test datatest
-
+First of all, we fixed the data of the test set to avoid the result error caused by the difference of the test set in the subsequent calculation process.
 ```{r dataset}
 set.seed(1234)
 x1 <- runif(1000)
@@ -51,7 +51,7 @@ testlabels3 <- as.factor(y3)
 ```
 
 #build the train dataset for 1000 times with the size of 100
-create 1000 training datasets of size 100, learn a random forest from each dataset, and compute the misclassification error in the same test dataset of size 1000. Report results for when the random forest has 1, 10 and 100 trees.
+Create 1000 training datasets of size 100, learn a random forest from each dataset, and compute the misclassification error in the same test dataset of size 1000. Report results for when the random forest has 1, 10 and 100 trees.
 ```{r example 1-1}
 error_rate_1<- list(
   number1 = rep(0,1000),
@@ -219,8 +219,10 @@ Despite being more complex, the random forest performs better on the third datas
 ## Assignment 2:MIXTURE MODELS
 
 In this assignment,we will chose different values of M,and compare their
-fit results.
-
+fit results.The E and M steps are calculated as follows:
+![EM-step](images/EM.png)
+and the formula for calculating the log-likelihood value  is as follows:
+![loglikelihood](images/log-likelihood.png)
 ```{r}
 # Let's take K=3 for example
 set.seed(1234567890)
@@ -285,7 +287,7 @@ for(it in 1:max_it) {
   cat("iteration: ", it, "log likelihood: ", llik[it], "\n")
   flush.console()
   
-  # Stop if the lok likelihood has not changed significantly
+  # Stop if the log likelihood has not changed significantly
   if (it > 1 && abs(llik[it] - llik[it - 1]) < min_change) {
     cat("Converged at iteration", it, "\n")
     break
