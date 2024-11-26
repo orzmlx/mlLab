@@ -160,14 +160,7 @@ result<- list(
 )
 print(result)
 
-
-#' As the number of trees in the random forest increases, the mean error rate decreases. This happens because:
-#' A random forest combines multiple decision trees. As more trees are added, the predictions are averaged, reducing the variance of the model.
-#' With more trees, the random forest effectively samples a larger variety of subsets from the training data. This increases the likelihood that the model captures the true underlying patterns
-#' Random forests are capable of capturing non-linear patterns effectively by aggregating multiple decision trees.
-#' Despite being more complex, the random forest performs better on the third dataset with sufficient trees because:
-#' With enough trees, the random forest can approximate complex decision boundaries like the one in the third dataset.
-#' The increased complexity of the third dataset provides a stronger signal for the model to learn from. This reduces the risk of the random forest overfitting to noise, especially when the dataset is large and diverse.
+#assignment2
 
 set.seed(1234567890)
 max_it <- 100 # max number of EM iterations
@@ -191,7 +184,7 @@ for(i in 1:n) {
     x[i,d] <- rbinom(1,1,true_mu[m,d])
   }
 }
-M=4 # number of clusters
+M=3 # number of clusters
 w <- matrix(nrow=n, ncol=M) # weights
 pi <- vector(length = M) # mixing coefficients
 mu <- matrix(nrow=M, ncol=D) # conditional distributions
@@ -208,7 +201,7 @@ for(it in 1:max_it) {
   plot(mu[1,], type="o", col="blue", ylim=c(0,1))
   points(mu[2,], type="o", col="red")
   points(mu[3,], type="o", col="green")
-  points(mu[4,], type="o", col="yellow")
+  #points(mu[4,], type="o", col="yellow")
   Sys.sleep(0.5)
   # E-step: Computation of the weights
   # Your code here

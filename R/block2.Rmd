@@ -275,16 +275,7 @@ for(it in 1:max_it) {
       w[i, m] <- numerator / denominator
     }
   }
-
-  #M-step: ML parameter estimation from the data and weights
-  for (m in 1:M) {
-    pi[m] <- sum(w[, m]) / n
-    for (d in 1:D) {
-      mu[m, d] <- sum(w[, m] * x[, d]) / sum(w[, m])
-    }
-  }
-  
-  #Log likelihood computation.
+#Log likelihood computation.
   llik[it] <- sum(sapply(1:n, function(i) {
     log(sum(sapply(1:M, function(m) {
       pi[m] * prod(mu[m, ]^x[i, ] * (1 - mu[m, ])^(1 - x[i, ]))
@@ -299,19 +290,21 @@ for(it in 1:max_it) {
     cat("Converged at iteration", it, "\n")
     break
   }
+  
+  #M-step: ML parameter estimation from the data and weights
+  for (m in 1:M) {
+    pi[m] <- sum(w[, m]) / n
+    for (d in 1:D) {
+      mu[m, d] <- sum(w[, m] * x[, d]) / sum(w[, m])
+    }
+  }
 }
 pi
 mu
 plot(llik[1:it], type="o")
 ```
 
-We can get results for different K values.According to the mu value,
-when M=3, the model fits the true structure of the data well (the data
-is generated from 3 components), so the clustering and mean estimates
-are close to the true value. When M=4, mu[1,] and mu[2,] are close to
-the true value mu[3,], which may have the risk of overfitting; when M=2,
-the true distribution of the data (3 clusters) cannot be well matched,
-which may have the risk of underfitting.
+We can get results for different K values.When M is equal to 2, the coefficient (pi) approaches 0.5, meaning that the two clusters contribute nearly equally to the data. Although there are significant differences in the conditional distribution (mu) on each dimension,there is a big deviation from the true value, resulting in underfitting.When M is equal to 3, the convergence rate is slightly slower than when M is equal to 2, but the mu is more dispersed and closer to the true value, which can accurately capture the true structure of the data without being overly complicated.When M is equal to 4, the log-likelihood converges at the 44th iteration, and the convergence speed is the slowest, which indicates that the complexity of the model is significantly increased, and the weight of some clusters (such as pi1 and pi2) is very small, which indicates that the data may be unnecessarily split and overfitting may occur.
 
 ## Assignment 3:MIXTURE MODELS
 
