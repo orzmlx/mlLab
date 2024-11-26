@@ -7,6 +7,7 @@ set.seed(1234)
 x1 <- runif(1000)
 x2 <- runif(1000)
 testdata <- cbind(x1, x2)
+colnames(testdata) <- c("x1", "x2")
 y1 <- as.numeric(x1 < x2)
 testlabels <- as.factor(y1)
 y2 <- as.numeric(x1 < 0.5)
@@ -15,7 +16,16 @@ y3 <- as.numeric((x1<0.5 & x2<0.5) | (x1>0.5 & x2>0.5))
 testlabels3 <- as.factor(y3)
 
 #build the train dataset for 1000 times with the size of 100
+set.seed(123)
+train_data_list <- lapply(1:1000, function(i) {
+  x3 <- runif(100)
+  x4 <- runif(100)
+  trdata <- cbind(x3, x4)
+  colnames(trdata) <- c("x1", "x2")
+  list(trdata = trdata)
+})
 
+#condition1:
 error_rate_1<- list(
   number1 = rep(0,1000),
   number2 = rep(0,1000),
@@ -24,10 +34,8 @@ error_rate_1<- list(
 mean_error_1<- c()
 var_error_1<- c()
 for (i in 1:1000) {
-  x1 <- runif(100)
-  x2 <- runif(100)
-  trdata <- cbind(x1, x2)
-  y <- as.numeric(x1 < x2)
+  trdata <- train_data_list[[i]]$trdata
+  y <- as.numeric(trdata[, 1] < trdata[, 2])
   trlabels <- as.factor(y)
 
   #build the models
@@ -56,13 +64,7 @@ var_error_1[3] <- var(error_rate_1$number3)
 
 
 
-#change the conditions of x1/x3
-#build test datatest
-
-#y2 <- as.numeric(x1 < 0.5)
-#testlabels2 <- as.factor(y2)
-
-#build the train dataset for 1000 times with the size of 100
+#condition2:
 
 error_rate_2<- list(
   number1 = rep(0,1000),
@@ -72,10 +74,8 @@ error_rate_2<- list(
 mean_error_2<- c()
 var_error_2<- c()
 for (i in 1:1000) {
-  x1 <- runif(100)
-  x2 <- runif(100)
-  trdata <- cbind(x1, x2)
-  y <- as.numeric(x1 < 0.5)
+  trdata <- train_data_list[[i]]$trdata
+  y <- as.numeric(trdata[, 1] < 0.5)
   trlabels <- as.factor(y)
 
   #build the models
@@ -102,14 +102,7 @@ var_error_2[1] <- var(error_rate_2$number1)
 var_error_2[2] <- var(error_rate_2$number2)
 var_error_2[3] <- var(error_rate_2$number3)
 
-#change the conditions of x1/x3 and nodesize
-#build test datatest
-
-
-#y3 <- as.numeric((x1<0.5 & x2<0.5) | (x1>0.5 & x2>0.5))
-#testlabels3 <- as.factor(y3)
-
-#build the train dataset for 1000 times with the size of 100
+#condition3:
 
 error_rate_3<- list(
   number1 = rep(0,1000),
@@ -119,10 +112,8 @@ error_rate_3<- list(
 mean_error_3<- c()
 var_error_3<- c()
 for (i in 1:1000) {
-  x5 <- runif(100)
-  x6 <- runif(100)
-  trdata <- cbind(x1, x2)
-  y <- as.numeric((x1<0.5 & x2<0.5) | (x1>0.5 & x2>0.5))
+  trdata <- train_data_list[[i]]$trdata
+  y <- as.numeric((trdata[, 1] < 0.5 & trdata[, 2] < 0.5) | (trdata[, 1] > 0.5 & trdata[, 2] > 0.5))
   trlabels <- as.factor(y)
 
   #build the models
