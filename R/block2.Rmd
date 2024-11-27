@@ -54,7 +54,7 @@ y3 <- as.numeric((x1<0.5 & x2<0.5) | (x1>0.5 & x2>0.5))
 testlabels3 <- as.factor(y3)
 ```
 
-<<<<<<< HEAD
+
 #build the train dataset for 1000 times with the size of 100
 We created 1000 training data sets of size 100 and fixed them, learn a random forest from
 each data set, and compute the classification error in the same test
@@ -71,7 +71,7 @@ train_data_list <- lapply(1:1000, function(i) {
 })
 ```
 
-<<<<<<< HEAD
+
 #Conditon1 Compute the misclassification error in the same test dataset
 of size 1000. Report results for when the random forest has 1, 10 and
 100 trees.
