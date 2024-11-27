@@ -55,22 +55,11 @@ testlabels3 <- as.factor(y3)
 ```
 
 <<<<<<< HEAD
-#build the train dataset for 1000 times with the size of 100 Create 1000
-training data sets of size 100, learn a random forest from each data
-set, and compute the classification error in the same test data set of
-size 1000. Report results for when the random forest has 1, 10 and 100
-trees.
-
-We fixed the data of the train set.
-
-=======
-
 #build the train dataset for 1000 times with the size of 100
 We created 1000 training data sets of size 100 and fixed them, learn a random forest from
 each data set, and compute the classification error in the same test
 data set of size 1000. Report results for when the random forest has 1,
 10 and 100 trees.
->>>>>>> 8160302e365851763e12202687abf1e0dfc0db96
 ```{r train dataset}
 set.seed(123)
 train_data_list <- lapply(1:1000, function(i) {
@@ -87,12 +76,7 @@ train_data_list <- lapply(1:1000, function(i) {
 of size 1000. Report results for when the random forest has 1, 10 and
 100 trees.
 
-```{r example 1-1}
-=======
-#Conditon1
-Compute the misclassification error in the same test dataset of size 1000. Report results for when the random forest has 1, 10 and 100 trees.
 ```{r include=FALSE}
->>>>>>> 8160302e365851763e12202687abf1e0dfc0db96
 error_rate_1<- list(
   number1 = rep(0,1000),
   number2 = rep(0,1000),
