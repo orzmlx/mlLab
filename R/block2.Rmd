@@ -123,6 +123,7 @@ for (i in 1:1000) {
 
 #compute the mean and variance of error rates
 
+```{r include=FALSE}
 mean_error_1[1]<- mean(error_rate_1$number1)
 mean_error_1[2]<- mean(error_rate_1$number2)
 mean_error_1[3]<- mean(error_rate_1$number3)
@@ -227,6 +228,7 @@ var_error_3[3] <- var(error_rate_3$number3)
 
 #summary the results
 
+```{r include=FALSE}
 result<- list(
   mean_error_1 = mean_error_1,
   mean_error_2 = mean_error_2,
