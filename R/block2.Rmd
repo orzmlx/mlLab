@@ -29,7 +29,6 @@ options(repos = c(CRAN = "https://cran.r-project.org"))
 
 ## Assignment 1:ENSEMBLE METHODS
 
-
 ```{r include=FALSE}
 install.packages("randomForest")
 library(randomForest)
@@ -54,14 +53,14 @@ y3 <- as.numeric((x1<0.5 & x2<0.5) | (x1>0.5 & x2>0.5))
 testlabels3 <- as.factor(y3)
 ```
 
-
-#build the train dataset for 1000 times with the size of 100
-Create 1000 training data sets of size 100, learn a random forest from
-each data set, and compute the classification error in the same test
-data set of size 1000. Report results for when the random forest has 1,
-10 and 100 trees.
+#build the train dataset for 1000 times with the size of 100 Create 1000
+training data sets of size 100, learn a random forest from each data
+set, and compute the classification error in the same test data set of
+size 1000. Report results for when the random forest has 1, 10 and 100
+trees.
 
 We fixed the data of the train set.
+
 ```{r train dataset}
 set.seed(123)
 train_data_list <- lapply(1:1000, function(i) {
@@ -73,8 +72,10 @@ train_data_list <- lapply(1:1000, function(i) {
 })
 ```
 
-#Conditon1
-Compute the misclassification error in the same test dataset of size 1000. Report results for when the random forest has 1, 10 and 100 trees.
+#Conditon1 Compute the misclassification error in the same test dataset
+of size 1000. Report results for when the random forest has 1, 10 and
+100 trees.
+
 ```{r example 1-1}
 error_rate_1<- list(
   number1 = rep(0,1000),
