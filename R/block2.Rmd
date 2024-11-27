@@ -45,6 +45,7 @@ set.seed(1234)
 x1 <- runif(1000)
 x2 <- runif(1000)
 testdata <- cbind(x1, x2)
+colnames(testdata) <- c("x1", "x2")
 y1 <- as.numeric(x1 < x2)
 testlabels <- as.factor(y1)
 y2 <- as.numeric(x1 < 0.5)
@@ -53,6 +54,7 @@ y3 <- as.numeric((x1<0.5 & x2<0.5) | (x1>0.5 & x2>0.5))
 testlabels3 <- as.factor(y3)
 ```
 
+<<<<<<< HEAD
 #build the train dataset for 1000 times with the size of 100 Create 1000
 training data sets of size 100, learn a random forest from each data
 set, and compute the classification error in the same test data set of
@@ -61,6 +63,14 @@ trees.
 
 We fixed the data of the train set.
 
+=======
+
+#build the train dataset for 1000 times with the size of 100
+We created 1000 training data sets of size 100 and fixed them, learn a random forest from
+each data set, and compute the classification error in the same test
+data set of size 1000. Report results for when the random forest has 1,
+10 and 100 trees.
+>>>>>>> 8160302e365851763e12202687abf1e0dfc0db96
 ```{r train dataset}
 set.seed(123)
 train_data_list <- lapply(1:1000, function(i) {
@@ -72,11 +82,17 @@ train_data_list <- lapply(1:1000, function(i) {
 })
 ```
 
+<<<<<<< HEAD
 #Conditon1 Compute the misclassification error in the same test dataset
 of size 1000. Report results for when the random forest has 1, 10 and
 100 trees.
 
 ```{r example 1-1}
+=======
+#Conditon1
+Compute the misclassification error in the same test dataset of size 1000. Report results for when the random forest has 1, 10 and 100 trees.
+```{r include=FALSE}
+>>>>>>> 8160302e365851763e12202687abf1e0dfc0db96
 error_rate_1<- list(
   number1 = rep(0,1000),
   number2 = rep(0,1000),
@@ -107,7 +123,6 @@ for (i in 1:1000) {
 
 #compute the mean and variance of error rates
 
-```{r example 1-2}
 mean_error_1[1]<- mean(error_rate_1$number1)
 mean_error_1[2]<- mean(error_rate_1$number2)
 mean_error_1[3]<- mean(error_rate_1$number3)
@@ -212,7 +227,6 @@ var_error_3[3] <- var(error_rate_3$number3)
 
 #summary the results
 
-```{r example 1-7}
 result<- list(
   mean_error_1 = mean_error_1,
   mean_error_2 = mean_error_2,
