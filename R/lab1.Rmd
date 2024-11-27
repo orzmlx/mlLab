@@ -398,7 +398,7 @@ print(result)
 
 In general, a lower test MSE indicates that the model generalizes better. Higher degrees of freedom mean that models are more flexible and tend to fit details in the data, but can lead to overfitting; Lower degrees of freedom mean that the model is smoother, limiting the fit to the training data.
 
-In this example, when penalty parameter equals to 1 and 100, there is no big difference between the model's train_mse2 and test_mse2(only about 0.0002 difference), both are relatively small. However, when lambda equals 1, df is large and there is a risk of overfitting. So lambda equals 100 is the most appropriate. choice.
+In this example, when penalty parameter equals to 1 and 100, the train_mse2 does not change very much(only about 0.0002 difference), both are relatively small. However, when lambda equals 1, df is large and there is a risk of overfitting. So lambda equals 100 is the most appropriate choice.
 
 # Assignment 3. Logistic regression and basis function expansion
 
