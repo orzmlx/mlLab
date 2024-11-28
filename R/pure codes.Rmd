@@ -1,9 +1,35 @@
+---
+title: "Block2 Group A2"
+author: |
+  liume102@student.liu.se  
+  hanxi898@student.liu.se  
+  xiali125@student.liu.se
+date: "2024-11-26"
+output:
+  pdf_document: 
+    latex_engine: xelatex
+    number_sections: true
+    fig_width: 7
+    highlight: tango
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+Sys.setlocale("LC_ALL", "sv_SE.UTF-8")
+options(repos = c(CRAN = "https://cran.r-project.org"))
+```
+
+## Assignment 1:ENSEMBLE METHODS
+
+```{r, eval=FALSE}
 
 
 install.packages("randomForest")
 library(randomForest)
 
-#build test datatest
+#build test dataset
 set.seed(1234)
 x1 <- runif(1000)
 x2 <- runif(1000)
@@ -38,7 +64,7 @@ for (i in 1:1000) {
   trdata <- train_data_list[[i]]$trdata
   y <- as.numeric(trdata[, 1] < trdata[, 2])
   trlabels <- as.factor(y)
-
+  
   #build the models
   rf_model1 <- randomForest(
     trdata,
@@ -61,7 +87,7 @@ for (i in 1:1000) {
     nodesize = 25,
     keep.forest = TRUE
   )
-
+  
   #predictions and error rates
   predictions1 <- predict(rf_model1, testdata)
   error_rate_1$number1[i] <- mean(predictions1 != testlabels)
@@ -69,7 +95,7 @@ for (i in 1:1000) {
   error_rate_1$number2[i] <- mean(predictions2 != testlabels)
   predictions3 <- predict(rf_model3, testdata)
   error_rate_1$number3[i] <- mean(predictions3 != testlabels)
-
+  
 }
 
 #compute the mean and variance of error rates
@@ -96,7 +122,7 @@ for (i in 1:1000) {
   trdata <- train_data_list[[i]]$trdata
   y <- as.numeric(trdata[, 1] < 0.5)
   trlabels <- as.factor(y)
-
+  
   #build the models
   rf_model1 <- randomForest(
     trdata,
@@ -119,7 +145,7 @@ for (i in 1:1000) {
     nodesize = 25,
     keep.forest = TRUE
   )
-
+  
   #predictions and error rates
   predictions1 <- predict(rf_model1, testdata)
   error_rate_2$number1[i] <- mean(predictions1 != testlabels2)
@@ -127,7 +153,7 @@ for (i in 1:1000) {
   error_rate_2$number2[i] <- mean(predictions2 != testlabels2)
   predictions3 <- predict(rf_model3, testdata)
   error_rate_2$number3[i] <- mean(predictions3 != testlabels2)
-
+  
 }
 
 #compute the mean and variance of error rates
@@ -153,7 +179,7 @@ for (i in 1:1000) {
   y <- as.numeric((trdata[, 1] < 0.5 &
                      trdata[, 2] < 0.5) | (trdata[, 1] > 0.5 & trdata[, 2] > 0.5))
   trlabels <- as.factor(y)
-
+  
   #build the models
   rf_model1 <- randomForest(
     trdata,
@@ -176,7 +202,7 @@ for (i in 1:1000) {
     nodesize = 12,
     keep.forest = TRUE
   )
-
+  
   #predictions and error rates
   predictions1 <- predict(rf_model1, testdata)
   error_rate_3$number1[i] <- mean(predictions1 != testlabels3)
@@ -184,7 +210,7 @@ for (i in 1:1000) {
   error_rate_3$number2[i] <- mean(predictions2 != testlabels3)
   predictions3 <- predict(rf_model3, testdata)
   error_rate_3$number3[i] <- mean(predictions3 != testlabels3)
-
+  
 }
 
 #compute the mean and variance of error rates
@@ -200,7 +226,7 @@ result <- list(
   mean_error_1 = mean_error_1,
   mean_error_2 = mean_error_2,
   mean_error_3 = mean_error_3,
-
+  
   var_error_1 = var_error_1,
   var_error_2 = var_error_2,
   var_error_3 = var_error_3
@@ -267,17 +293,17 @@ for (it in 1:max_it) {
       w[i, m] <- numerator / denominator
     }
   }
-
-
+  
+  
   #Log likelihood computation.
   # Your code here
-
+  
   llik[it] <- sum(sapply(1:n, function(i) {
     log(sum(sapply(1:M, function(m) {
       pi[m] * prod(mu[m, ] ^ x[i, ] * (1 - mu[m, ]) ^ (1 - x[i, ]))
     })))
   }))
-
+  
   cat("iteration: ", it, "log likelihood: ", llik[it], "\n")
   flush.console()
   # Stop if the lok likelihood has not changed significantly
@@ -288,7 +314,7 @@ for (it in 1:max_it) {
   }
   #M-step: ML parameter estimation from the data and weights
   # Your code here
-
+  
   for (m in 1:M) {
     pi[m] <- sum(w[, m]) / n
     for (d in 1:D) {
@@ -299,3 +325,5 @@ for (it in 1:max_it) {
 pi
 mu
 plot(llik[1:it], type = "o")
+
+```
