@@ -145,38 +145,6 @@ f1_score_mat <- 2 * (precision_mat * recall_mat) / (precision_mat + recall_mat)
 
 #6 use the optional tree and a logistic regression model to classify the test data
 # by using the following principle
-install.packages("glmnet")
-library(glmnet)
-
-# Logistic Regression Model
-library(glmnet)
-
-# Prepare the data
-X_train <- model.matrix(y ~ . - 1, data = train)
-y_train <- train$y
-X_test <- model.matrix(y ~ . - 1, data = test)
-y_test <- test$y
-
-# Fit logistic regression
-log_model <- glmnet(X_train, y_train, family = "binomial")
-
-# Predict using logistic regression
-log_predictions <- predict(log_model, newx = X_test, type = "class")
-
-# Compare performances
-# Calculate confusion matrix, accuracy, F1 score for logistic regression
-conf_mat_log <- table(y_test, log_predictions)
-accuracy_log = sum(diag(conf_mat_log)) / dim(test)[1]
-
-# Calculate F1 score for logistic regression
-true_positives_log <- conf_mat_log[2, 2]
-false_positives_log <- conf_mat_log[1, 2]
-false_negatives_log <- conf_mat_log[2, 1]
-
-precision_log <- true_positives_log / (true_positives_log + false_positives_log)
-recall_log <- true_positives_log / (true_positives_log + false_negatives_log)
-f1_score_log <- 2 * (precision_log * recall_log) / (precision_log + recall_log)
-
 
 # Load necessary libraries
 library(glmnet)
