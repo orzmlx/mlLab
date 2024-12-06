@@ -1,0 +1,121 @@
+---
+title: "Block2 Group A2"
+author: |
+  liume102@student.liu.se  
+  hanxi898@student.liu.se  
+  xiali125@student.liu.se
+date: "2024-11-26"
+output:
+  pdf_document: 
+    latex_engine: xelatex
+    number_sections: true
+    fig_width: 7
+    highlight: tango
+    toc: true
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+
+
+
+```{r setup, include=FALSE}
+library(glmnet)
+library(caret)
+data <- read.csv("../../data/tecator.csv")
+X <- as.matrix(data[, 1:100])  # 吸收光谱特征
+y <- data$Fat                 # 脂肪含量
+set.seed(12345)
+train_index <- createDataPartition(y, p = 0.5, list = FALSE)
+X_train <- X[train_index, ]
+X_test <- X[-train_index, ]
+y_train <- y[train_index]
+y_test <- y[-train_index]
+```
+
+
+```{r include=FALSE}
+lm_model <- lm(y_train ~ X_train)
+y_train_pred <- predict(lm_model, newdata = as.data.frame(X_train))
+y_test_pred <- predict(lm_model, newdata = as.data.frame(X_test))
+
+# calculate MSE
+train_mse <- mean((y_train - y_train_pred)^2)
+test_mse <- mean((y_test - y_test_pred)^2)
+
+cat("Linear Regression - Training MSE:", train_mse, "\n")
+cat("Linear Regression - Testing MSE:", test_mse, "\n")
+```
+
+
+
+```{r}
+# LASSO 回归
+lasso_model <- glmnet(X_train, y_train, alpha = 1)
+par(mar = c(5, 4, 6, 2)) 
+# 绘制回归系数随 log(λ) 的变化
+plot(lasso_model, xvar = "lambda")
+
+title("LASSO Coefficients vs log(λ)")
+```
+
+```{r include=FALSE}
+# 会自动选择最佳的 lambda
+cv_lasso_model <- cv.glmnet(X_train, y_train, alpha = 1)
+
+optimal_lambda <- cv_lasso_model$lambda.min
+cat("best lambda value", optimal_lambda, "\n")
+selected_features <- function(model, lambda_value) {
+  coefs <- coef(model, s = lambda_value)
+  # coef_abs <- abs(as.matrix(lasso_coef[-1, ]))  # 去掉截距
+  coef_abs <- abs(as.matrix(coefs[-1, ]))  
+  sorted_indices <- order(coef_abs, decreasing = TRUE)
+  selected_features <- rownames(coef_abs)[sorted_indices[1:3]]
+  return(selected_features)  
+}
+
+lambda_with_3_features <- selected_features(cv_lasso_model, optimal_lambda)
+cat("Lambda with 3 features:", lambda_with_3_features, "\n")
+```
+
+
+
+```{r}
+
+ridge_model <- glmnet(X_train, y_train, alpha = 0)  # alpha = 0 表示 Ridge
+par(mar = c(5, 4, 6, 2)) 
+# 绘制 Ridge 回归系数随 log(lambda) 的变化
+plot(ridge_model, xvar = "lambda", label = TRUE)
+title("RelationShip between Ridge and log(Lambda)")
+```
+
+
+```{r}
+cv_lasso <- cv.glmnet(X_train, y_train, alpha = 1)
+
+# Step 2: Plot the cross-validation score vs. log(lambda)
+plot(cv_lasso)
+optimal_lambda <- cv_lasso$lambda.min  # Optimal lambda based on minimum CV error
+
+coefficients_optimal <- coef(cv_lasso, s = "lambda.min")
+num_selected_variables <- sum(coefficients_optimal != 0) - 1  # Subtract 1 to exclude intercept
+num_selected_variables
+
+
+# Step 4: Compare the optimal lambda with log(lambda) = -4 (statistical significance)
+# To check if log(lambda) = -4 leads to a statistically significantly worse prediction:
+lambda_at_minus_4 <- cv_lasso$lambda[which.min(abs(log(cv_lasso$lambda) - (-4)))]
+lambda_at_minus_4
+cv_error_at_minus_4 <- cv_lasso$cvm[which.min(abs(log(cv_lasso$lambda) - (-4)))]
+cv_error_at_minus_4
+
+test_pred_optimal_lambda <- predict(cv_lasso, X_test, s = "lambda.min")
+
+# Create a scatter plot
+plot(y_test, test_pred_optimal_lambda, main = "Test vs Predicted Fat Content (Optimal Lambda)", 
+     xlab = "Actual Fat Content", ylab = "Predicted Fat Content", col = "blue", pch = 19)
+
+# Add a reference line (y = x) for perfect prediction
+abline(0, 1, col = "red")
+```
