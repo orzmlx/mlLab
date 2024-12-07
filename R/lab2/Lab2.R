@@ -146,30 +146,49 @@ f1_score_mat <- 2 * (precision_mat * recall_mat) / (precision_mat + recall_mat)
 #6 use the optional tree and a logistic regression model to classify the test data
 # by using the following principle
 
-# Load necessary libraries
-library(glmnet)
-library(pROC)
 
-# Use the decision tree model to predict on the test data
-y_pred_tree <- predict(finalTree, newdata = test, type = "class")
-
-# Fit a logistic regression model on the test data
+library(rpart)
+X_train <- model.matrix(y ~ . - 1, data = train)
+y_train <- train$y
 X_test <- model.matrix(y ~ . - 1, data = test)
 y_test <- test$y
-log_model <- glmnet(X_test, y_test, family = "binomial")
-y_pred_log <- predict(log_model, newx = X_test, type = "class")
+# Assuming the decision tree and logistic regression models are already trained
+logreg_model <- glm(y ~ ., data = train_data, family = binomial)
 
-# Compute TPR and FPR for decision tree model
-tree_roc <- roc(test$y, as.numeric(y_pred_tree))
-tree_tpr <- tree_roc$sensitivities
-tree_fpr <- 1 - tree_roc$specificities
+# Train the optimal Decision Tree Model (assumed to be selected earlier)
+finalTree <- rpart(y ~ ., data = train_data, method = "class", control = rpart.control(maxdepth = 13))
+# Decision tree predictions (probabilities)
+tree_pred_probs <- predict(finalTree, newdata = test, type = "prob")[,2]
 
-# Compute TPR and FPR for logistic regression model
-log_roc <- roc(test$y, as.numeric(y_pred_log))
-log_tpr <- log_roc$sensitivities
-log_fpr <- 1 - log_roc$specificities
+# Logistic regression predictions (probabilities)
+logreg_pred_probs <- predict(logreg_model, newdata = test, type = "response")
+tree_pred_probs <- predict(finalTree, test, type = "prob")[, "yes"]
+compute_tpr_fpr <- function(pred_probs, true_labels, threshold) {
+  preds <- ifelse(pred_probs > threshold, "yes", "no")
+  preds <- factor(preds, levels = c("no", "yes"))
 
-# Plot ROC curves
-plot(tree_roc, col = "blue", main = "ROC Curves")
-lines(log_roc, col = "red")
-legend("bottomright", legend = c("Decision Tree", "Logistic Regression"), col = c("blue", "red"), lty = 1)
+  confusion <- table(Predicted = preds, Actual = true_labels)
+
+  TP <- confusion[2, 2]  # Predicted = yes, Actual = yes
+  FP <- confusion[2, 1]  # Predicted = yes, Actual = no
+  FN <- confusion[1, 2]  # Predicted = no, Actual = yes
+  TN <- confusion[1, 1]  # Predicted = no, Actual = no
+  TPR <- TP / (TP + FN)  # True Positive Rate
+  FPR <- FP / (FP + TN)  # False Positive Rate
+  return(c(TPR, FPR))
+}
+
+# Calculate TPR and FPR for multiple thresholds
+thresholds <- seq(0.05, 0.95, by = 0.05)
+logistic_tpr_fpr <- sapply(thresholds, function(threshold) compute_tpr_fpr(logreg_pred_probs, test$y, threshold))
+tree_tpr_fpr <- sapply(thresholds, function(threshold) compute_tpr_fpr(tree_pred_probs, test$y, threshold))
+
+# Separate the TPR and FPR for logistic and decision tree
+logistic_tpr <- logistic_tpr_fpr[1, ]
+logistic_fpr <- logistic_tpr_fpr[2, ]
+tree_tpr <- tree_tpr_fpr[1, ]
+tree_fpr <- tree_tpr_fpr[2, ]
+# Plot ROC curves for Logistic Regression and Decision Tree
+plot(logistic_fpr, logistic_tpr, type = "l", col = "blue", xlab = "False Positive Rate", ylab = "True Positive Rate", lwd = 2)
+lines(tree_fpr, tree_tpr, col = "red", lwd = 2)
+legend("bottomright", legend = c("Logistic Regression", "Decision Tree"), col = c("blue", "red"), lwd = 2)
