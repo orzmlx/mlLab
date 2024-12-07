@@ -20,7 +20,7 @@ editor_options:
 library(caret)  # for data partitioning
 library(rpart)
 data <- read.csv(
-  '../../data/bank-full.csv',
+  'bank-full.csv',
   sep = ";",
   header = TRUE,
   stringsAsFactors = TRUE

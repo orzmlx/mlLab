@@ -1,3 +1,5 @@
+#Assignment 2
+
 data <- read.csv(
   'bank-full.csv',
   sep = ";",
