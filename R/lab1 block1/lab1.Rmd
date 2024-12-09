@@ -271,7 +271,7 @@ library(caret)
 
 ## Prepare the dataset
 
-Firstly, we read the file and divided the data into training and test data (60/40).
+Task1. Firstly, we read the file and divided the data into training and test data (60/40).
 
 ```{r code2-1}
 data <- read.csv("../data/parkinsons.csv") #
@@ -291,7 +291,7 @@ test_data_scaled<- predict(scale_para,test_data)
 
 ## Build models
 
-Next, we computed a linear regression model , estimate training and test MSE
+Task2. Next, we computed a linear regression model , estimate training and test MSE. the p-values are summarized in the picture.
 
 ```{r code2-3}
 model<- lm(motor_UPDRS ~ .-subject. -age -sex -test_time -total_UPDRS - 1,train_data_scaled)
@@ -299,10 +299,15 @@ train_prediction<- predict(model,train_data_scaled)
 train_mse<- mean((train_prediction - train_data_scaled$motor_UPDRS)^2)
 test_prediction<- predict(model,test_data_scaled)
 test_mse<- mean((test_prediction - test_data_scaled$motor_UPDRS)^2)
-summary(model)
 ```
+![model](images/model1.png)
 
-Implement 4 following functions:
+A smaller p-value means a larger contribution to the model. Specifically, Jitter.Abs., Shimmer.APQ5, Shimmer.APQ11, NHR, HNR, DFA and PPE contribute significantly to the model.
+We did predictions on both the test data and the training data using the linear regression model that we got. And then we calculated the MSE of training and test data.The results are as follows:
+test_MSE:0.9354477
+training_MSE:0.8785431
+
+Task3. Implement 4 following functions:
 
 loglikelihiid function that for a given parameter vector theta and dispersion sigma.
 
@@ -326,7 +331,7 @@ ridge <- function(theta, sigma, lambda, x, y) {
 }
 ```
 
-Use function optim() with method=”BFGS” to find the optimal theta and sigma for the given lambda.
+Using function optim() with method=”BFGS” to find the optimal theta and sigma for the given lambda.
 
 ```{r code2-6}
 ridgeopt <- function(lambda, x, y) {
@@ -344,7 +349,7 @@ ridgeopt <- function(lambda, x, y) {
 }
 ```
 
-computes the degrees of freedom of the Ridge model based on the training data.
+Computing the degrees of freedom of the Ridge model based on the training data.
 
 ```{r code2-7}
 freedom_degree <- function(lambda, x) {
@@ -357,7 +362,7 @@ freedom_degree <- function(lambda, x) {
 
 ## predict the values
 
-Finally, we can compute optimal theta parameters for different lambda values by using function RidgeOpt.
+Task4. Finally, we can compute optimal theta parameters for different lambda values by using function RidgeOpt.
 
 ```{r code2-8}
 train_data2<- as.matrix(train_data_scaled[,names(train_data)!="motor_UPDRS"])
@@ -398,7 +403,7 @@ print(result)
 
 In general, a lower test MSE indicates that the model generalizes better. Higher degrees of freedom mean that models are more flexible and tend to fit details in the data, but can lead to overfitting; Lower degrees of freedom mean that the model is smoother, limiting the fit to the training data.
 
-In this example, when penalty parameter equals to 1 and 100, the train_mse2 does not change very much(only about 0.0002 difference), both are relatively small. However, when lambda equals 1, df is large and there is a risk of overfitting. So lambda equals 100 is the most appropriate choice.
+In this example, with the increase of parameter value, the MSEs of training and test data increase gradually and the degrees of freedom decrease gradually. However, when the parameter changes from 1 to 100, the MSEs change little (only 0.0002), and when the parameter changes from 100 to 1000, the MSEs increase more. Although parameter values equal to 1 and 100 are not much of a difference in MSEs, both are relatively small. However, when lambda equals 1, df is significant large and there is a risk of overfitting. So lambda equals 100 is the most appropriate choice.
 
 # Assignment 3. Logistic regression and basis function expansion
 
