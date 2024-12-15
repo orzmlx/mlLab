@@ -3,13 +3,14 @@ library(geosphere)
 stations <- read.csv("stations.csv", fileEncoding = "latin1")
 temps <- read.csv("temps50k.csv")
 st <- merge(stations, temps, by = "station_number")
-h_distance <- 300000# These three values are up to the students
-h_date <- 10000
-h_time <- 20
+h_distance <- 100000# These three values are up to the students
+h_date <- 20
+h_time <- 2
 a <- 58.4274 # The point to predict (up to the students)
 b <- 14.826
-date <- "2013-11-04" # The date to predict (up to the students)
-times_input <- c("04:00:00", "06:00:00", "24:00:00")
+date <- "2013-07-04" # The date to predict (up to the students)
+times_input <- c("04:00:00", "06:00:00","08:00:00","10:00:00","12:00:00","14:00:00","16:00:00",
+                 "18:00:00","20:00:00","22:00:00","24:00:00")
 temp <- vector(length = length(times_input))
 
 # Students’ code here
@@ -43,12 +44,14 @@ for (j in 1:length(times)) {
 
 
     #distance between the day a temperature is measured and the day of interest
-    k_result[[j]][i, 3] <- as.numeric(abs(as.Date(st_date[i]) - as.Date(date)))
+    k_result[[j]][i, 3] <- abs(as.numeric(format(st_date[i], "%j")) - as.numeric(format(date, "%j")))
+    k_result[[j]][i, 3] <- min(k_result[[j]][i, 3],365-k_result[[j]][i, 3])
     k_result[[j]][i, 4] <- exp(-k_result[[j]][i, 3] ^ 2 / 2 / (h_date) ^ 2)
 
     #distance between the hour of the day temperature is measured and the hour of interest
 
-    k_result[[j]][i, 5] <- as.numeric(abs(difftime(st_time[i], times[j])))
+    k_result[[j]][i, 5] <- abs(as.numeric(format(st_time[i], "%H")) - as.numeric(format(times[j], "%H")))
+    k_result[[j]][i, 5] <- min(k_result[[j]][i, 5],24-k_result[[j]][i, 5])
     k_result[[j]][i, 6] <- exp(-k_result[[j]][i, 5] ^ 2 / 2 / (h_time) ^ 2)
 
     k_result[[j]][i, 7] <- st$air_temperature[i]
@@ -96,7 +99,7 @@ g <- ggplot(k_result_df_mul, aes(x = Time_diff, y = k_time)) +
   geom_point()
 
 
-hours <- as.character(substr(times_input, 1, 2))
+hours <- as.numeric(as.character(substr(times_input, 1, 2)))
 pred_temp_df <- cbind(hours, pred_temp_mult, pred_temp_sum)
 
 h <- ggplot(pred_temp_df) +
@@ -104,8 +107,5 @@ h <- ggplot(pred_temp_df) +
   geom_point(aes(x = hours, y = pred_temp_mult,group=1), color = 'red') +
   geom_line(aes(x = hours, y = pred_temp_sum,group=2), color = 'blue') +
   geom_point(aes(x = hours, y = pred_temp_sum,group=2), color = 'blue')
-
-
-
 
 print(h)
