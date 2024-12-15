@@ -3,8 +3,8 @@ library(geosphere)
 stations <- read.csv("stations.csv", fileEncoding = "latin1")
 temps <- read.csv("temps50k.csv")
 st <- merge(stations, temps, by = "station_number")
-h_distance <- 100000# These three values are up to the students
-h_date <- 20
+h_distance <- 300000# These three values are up to the students
+h_date <- 40
 h_time <- 2
 a <- 58.4274 # The point to predict (up to the students)
 b <- 14.826
@@ -106,6 +106,14 @@ h <- ggplot(pred_temp_df) +
   geom_line(aes(x = hours, y = pred_temp_mult,group=1), color = 'red') +
   geom_point(aes(x = hours, y = pred_temp_mult,group=1), color = 'red') +
   geom_line(aes(x = hours, y = pred_temp_sum,group=2), color = 'blue') +
-  geom_point(aes(x = hours, y = pred_temp_sum,group=2), color = 'blue')
+  geom_point(aes(x = hours, y = pred_temp_sum,group=2), color = 'blue')+
+  geom_text(
+    aes(x = hours[length(hours)], y = pred_temp_mult[length(pred_temp_mult)]),
+    label = "Multiplication Method", color = "red", vjust = -0.5, hjust = 0
+  ) +
+  geom_text(
+    aes(x = hours[length(hours)], y = pred_temp_sum[length(pred_temp_sum)]),
+    label = "Summation Method", color = "blue", vjust = -0.5, hjust = 0
+  )
 
 print(h)
