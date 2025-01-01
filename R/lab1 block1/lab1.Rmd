@@ -40,7 +40,7 @@ Now that our packages are loaded and we divide it into training, validation and 
 
 ```{r, code1-2,message=FALSE, warning=FALSE}
 # do not use StringAsFact = FALSE
-digitals <- read.csv('../data/optdigits.csv',header = FALSE)
+digitals <- read.csv('optdigits.csv',header = FALSE)
 # change all the columns to factor
 #digitals <- digitals %>% mutate_all(as.factor)
 digitals$V65 <- as.factor(digitals$V65)
@@ -90,12 +90,15 @@ train_error_rate <- 1-  sum(diag(train_confusion)) / sum(train_confusion)
 # only observer the top 10 rows
 cat("Misclassification errors on train data:", train_error_rate, '\n')
 cat("train_confusion:")
-table(train_digitals$V65[1:10], train_predictions[1:10])
+table(train_digitals$V65, train_predictions)
 cat("Misclassification errors on test data:", test_error_rate, '\n')
 cat("test confusion:")
-table(test_digitals$V65[1:10], knn_test_model$fitted.values[1:10])
+table(test_digitals$V65, knn_test_model$fitted.values)
 
 ```
+Comment on the quality of predictions for different digits and on the overall prediction
+quality:
+The prediction from test data has a higher misclassifications error rate (0.037) comparing to the training data (0.026). It is a good model with such low MSE even for test data. It is also shown from both data set that the model usually predicts the number '8' as number '1', indicting the difficulty when predict for number '8'. 
 
 ## Filter 2 cases of digit “8” in the training data which were easiest to classify and 3 cases that were hardest to classify
 
@@ -197,7 +200,7 @@ legend("topright", legend = c("Training Error", "Validation Error","Test Error")
 ```
 
 ## Change mis-classification error to cross-entropy
-
+As is shown from the figure, the optimal K value is around 10 with the lowest validation Cross-entropy error value. In cross-entropy method, the predicted probabilities for different classes are taken into account, making it more reliable cmparing with mis-classification error method in this classification problem.
 ```{r code1-9,message=FALSE, warning=FALSE}
 valid_cross_entropy_errors <- list()
 train_cross_entropy_errors <- list()
@@ -205,7 +208,7 @@ test_cross_entropy_errors <- list()
 
 for (ki in 1:30) {
 
-  print(ki)
+  #print(ki)
   valid_ki_model <- kknn(formula, train = train_digitals, test = valid_digitals, 
                          k = ki, kernel = 'rectangular')
   train_ki_model <- kknn(formula, train = train_digitals, test = train_digitals, 
@@ -234,9 +237,9 @@ for (ki in 1:30) {
                                            * train_log_probs) / nrow(train_digitals)
   test_cross_entropy_errors[[ki]] <- -sum(test_correct_class 
                                           * test_log_probs) / nrow(test_digitals)
-  print(-sum(valid_correct_class * valid_log_probs) )
-  print(-sum(train_correct_class * train_log_probs))
-  print(-sum(test_correct_class * test_log_probs) )
+  #print(-sum(valid_correct_class * valid_log_probs) )
+  #print(-sum(train_correct_class * train_log_probs))
+  #print(-sum(test_correct_class * test_log_probs) )
 }
 
 
@@ -258,6 +261,8 @@ legend("topright", legend = c("Training Cross-Entropy Error",
        col = c("red", "purple","green"), lty = 1)
 ```
 
+
+
 # Assignment 2: Linear regression and ridge regression
 
 ## set up
@@ -274,7 +279,7 @@ library(caret)
 Task1. Firstly, we read the file and divided the data into training and test data (60/40).
 
 ```{r code2-1}
-data <- read.csv("../data/parkinsons.csv") #
+data <- read.csv("parkinsons.csv") #
 set.seed(12345)
 ini_sample<- sample(1:nrow(data),0.6*nrow(data))
 train_data<- data[ini_sample,]
@@ -409,11 +414,11 @@ In this example, with the increase of parameter value, the MSEs of training and 
 
 ## Read Data and show scatter plot
 
-read data and give a scatter plot showing a Plasma glucose concentration on Age where observations are colored by Diabetes levels
+Read data and give a scatter plot showing a Plasma glucose concentration on Age where observations are colored by Diabetes levels.
 
 ```{r code3-1,message=FALSE, warning=FALSE}
 
-diabetes <- read.csv('../data/pima-indians-diabetes.csv',header = FALSE)
+diabetes <- read.csv('pima-indians-diabetes.csv',header = FALSE)
 colnames(diabetes) <- c('Pregnancies','Plasma_glucose','blood_pressure','TricepsSkinFoldThickness','SerumInsulin','BMI','DiabetesPedigreeFunction','Age','Diabetes')
 # 
 ggplot(diabetes,aes( x = diabetes$Age, y = diabetes$Plasma_glucose, color = diabetes$Diabetes)) + 
@@ -461,7 +466,7 @@ cat(" training misclassification error:",error_rate)
 
 ## Draw a scatter plot showing the predicted diabetes status
 
-we can see that the logistic regression visually separates the two classes of diabetes status well, but the mis classification error is high due to the overlap of the two classes, maybe change 𝑟 can improve the performance.we will try later
+We can see that the logistic regression visually separates the two classes of diabetes status well, but the mis classification error is high due to the overlap of the two classes, maybe change 𝑟 can improve the performance.we will try later.
 
 ```{r code3-3,message=FALSE, warning=FALSE}
 
@@ -473,7 +478,7 @@ ggtitle("Scatterplot of Plasma Glucose vs Age by Diabetes Status")
 
 ## Draw a decision boundary between the two predicted classes
 
-we can see that the boundary line try to split the dots into two classes and put the most the red dots below the line and the most blue dots above the line, but when the age exceed the 50, the performance of the model is not good.it seems that the number of red dot below the boundary line is same as the number above the line, it results the high misclassification error
+We can see that the boundary line try to split the dots into two classes and put the most the red dots below the line and the most blue dots above the line, but when the age exceed the 50, the performance of the model is not good.it seems that the number of red dot below the boundary line is same as the number above the line, it results the high misclassification error.
 
 ```{r code3-4,message=FALSE, warning=FALSE}
 
@@ -502,7 +507,7 @@ ggplot(diabetes,aes( x = diabetes$Age, y = diabetes$Plasma_glucose, color  = dia
 
 ## Change the thresholds r to 0.2 , 0.8 to see the what happened
 
-we can see that when r = 0.2, for the red dots , its TP is relatively high , but the Recall is low ,for the blue dots,its TP is lower than red dots, but the Recall is higher than red dots, it means that the model is more likely to predict the blue dots as the positive class, but the blue dots are more likely to be the negative class, it results in the high misclassification error, when r = 0.8, the model is more likely to predict the red dots as the positive class, but the red dots are more likely to be the negative class, it results in the high misclassification error
+We can see that when r = 0.2, for the red dots , its TP is relatively high , but the Recall is low ,for the blue dots,its TP is lower than red dots, but the Recall is higher than red dots, it means that the model is more likely to predict the blue dots as the positive class, but the blue dots are more likely to be the negative class, it results in the high misclassification error, when r = 0.8, the model is more likely to predict the red dots as the positive class, but the red dots are more likely to be the negative class, it results in the high misclassification error.
 
 ```{r code3-5,message=FALSE, warning=FALSE}
 
@@ -562,7 +567,7 @@ ggtitle("Scatterplot of Plasma Glucose vs Age by raw diabetes Status")
 
 ### Perform a basis function expansion trick
 
-we can see that after add the basis function expansion, the misclassification error is lower than the previous model, it means that the basis function expansion can improve the performance of the model, look at the coefficients furtherly, the new added variables slightly affect the prediction, it means that the new added variables affect the prediction positively and the decision boundary become from a line to a multidimensional graphics
+We can see that after add the basis function expansion, the misclassification error is lower than the previous model, it means that the basis function expansion can improve the performance of the model, look at the coefficients furtherly, the new added variables slightly affect the prediction, it means that the new added variables affect the prediction positively and the decision boundary become from a line to a multidimensional graphics.
 
 ```{r code3-8,message=FALSE, warning=FALSE}
 diabetes$z1 <- diabetes$Plasma_glucose^4
@@ -584,7 +589,7 @@ cat(new_gml_model$finalModel$coefficients)
 
 -   Why can it be important to consider various probability thresholds in the classification problems, according to the book?
 
-Probability thresholds serve as the reference point for evaluating performance of the model. Usually, a baseline is defined to indicate the model's worst performance level. And the achievable performance is defined by the maximum performance level. (Page 290 Baseline and Achievable Performance Level)
+Page 50. In binary classification problems, we can express the most probable class with decision threshold r= 0.5. With decision threshold r= 0.5, the misclassification rate is minimized. However, it can happen when the the miscassification problem is asymmetric or imbalanced. For example, in medical diagnosis problems, it is more important not to falsely predict the negative class than to falsely to predict a positive class, where the minimized misclassification rate is not appropriate. Furthermore, the medical diagnosis problem can be imbalanced when the disorder is very rare. In this case, accurate predictions of the negative class is valued higher than the accurate prediction of positive class if only misclassification rate is considered.
 
 -   What ways of collecting correct values of the target variable for the supervised learning problems are mentioned in the book?
 
@@ -634,8 +639,8 @@ test_confusion <- table(test_digitals$V65, knn_test_model$fitted.values)
 test_error_rate <- 1 - sum(diag(test_confusion)) / sum(test_confusion)
 train_error_rate <- 1-  sum(diag(train_confusion)) / sum(train_confusion)
 # only observer the top 10 rows
-table(train_digitals$V65[1:10], train_predictions[1:10])
-table(test_digitals$V65[1:10], knn_test_model$fitted.values[1:10])
+table(train_digitals$V65, train_predictions)
+table(test_digitals$V65, knn_test_model$fitted.values)
 library(dplyr)
 
 train_predict <- data.frame(train_digitals$V65, train_predictions,knn_train_model$prob)
